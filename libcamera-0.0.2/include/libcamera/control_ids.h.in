@@ -1,0 +1,37 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+/*
+ * Copyright (C) 2019, Google Inc.
+ *
+ * control_ids.h - Control ID list
+ *
+ * This file is auto-generated. Do not edit.
+ */
+
+#pragma once
+
+#include <array>
+#include <stdint.h>
+
+#include <libcamera/controls.h>
+
+namespace libcamera {
+
+namespace controls {
+
+enum {
+${ids}
+};
+
+${controls}
+
+extern const ControlIdMap controls;
+
+namespace draft {
+
+${draft_controls}
+
+} /* namespace draft */
+
+} /* namespace controls */
+
+} /* namespace libcamera */

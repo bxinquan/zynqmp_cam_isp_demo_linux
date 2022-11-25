@@ -1,0 +1,2 @@
+arch_compat: zynqmp_generic: all any noarch aarch64 armv8a armv8a_crc  cortexa72_cortexa53 zynqmp zynqmp_ev zynqmp_generic
+buildarch_compat: zynqmp_generic: noarch

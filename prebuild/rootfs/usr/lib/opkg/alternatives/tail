@@ -1,0 +1,3 @@
+/usr/bin/tail
+/bin/busybox 50
+/usr/bin/tail.coreutils 100

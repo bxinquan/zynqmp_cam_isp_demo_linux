@@ -1,0 +1,2 @@
+PyOpenSSL
+pyasn1>=0.1.1

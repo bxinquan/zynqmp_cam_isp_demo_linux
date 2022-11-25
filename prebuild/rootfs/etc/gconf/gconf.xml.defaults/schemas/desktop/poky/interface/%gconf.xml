@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="gtk-scrolled-window-placement" mtime="1520598896" type="schema" stype="string" owner="gnome">
+		<local_schema locale="C" short_desc="Scrolled window content placement">
+			<default type="string">
+				<stringvalue>GTK_CORNER_TOP_LEFT</stringvalue>
+			</default>
+		</local_schema>
+	</entry>
+	<entry name="gtk-im-status-style" mtime="1520598896" type="schema" stype="string" owner="gnome">
+		<local_schema locale="C" short_desc="GTK IM Status Style">
+			<default type="string">
+				<stringvalue>callback</stringvalue>
+			</default>
+			<longdesc>Name of the GTK+ input method Status Style used by gtk+.</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="gtk-im-preedit-style" mtime="1520598896" type="schema" stype="string" owner="gnome">
+		<local_schema locale="C" short_desc="GTK IM Preedit Style">
+			<default type="string">
+				<stringvalue>callback</stringvalue>
+			</default>
+			<longdesc>Name of the GTK+ input method Preedit Style used by gtk+.</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="touchscreen" mtime="1520598896" type="schema" stype="bool" owner="settings-daemon">
+		<local_schema locale="C" short_desc="GTK+ Touchscreen Mode">
+			<default type="bool" value="true"/>
+			<longdesc>When TRUE, there are no motion notify events delivered on this screen,
+      and widgets can&apos;t use the pointer hovering them for any essential
+      functionality.</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="menus_have_icons" mtime="1520598896" type="schema" stype="bool" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Menus Have Icons">
+			<default type="bool" value="false"/>
+			<longdesc>Whether menus may display an icon next to a menu entry</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="file_chooser_backend" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Module for GtkFileChooser">
+			<longdesc>Module to use as the filesystem model for the
+      GtkFileChooser widget.  Possible values are &quot;gnome-vfs&quot; and
+      &quot;gtk+&quot;.</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="icon_theme" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Icon Theme">
+			<default type="string">
+				<stringvalue>Sato</stringvalue>
+			</default>
+			<longdesc>The name of the icon theme to use in applications</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="cursor_blink_time" mtime="1520598896" type="schema" stype="int" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Cursor Blink Time">
+			<default type="int" value="1200"/>
+			<longdesc>Length of the cursor blink cycle, in milliseconds</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="cursor_blink" mtime="1520598896" type="schema" stype="bool" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Can Change Accels">
+			<default type="bool" value="true"/>
+			<longdesc>Whether the cursor should blink</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="can_change_accels" mtime="1520598896" type="schema" stype="bool" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Can Change Accels">
+			<default type="bool" value="false"/>
+			<longdesc>Whether the user can dynamically type a new accelerator when
+      positioned over an active menuitem</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="toolbar_icon_size" mtime="1520598896" type="schema" stype="int" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Toolbar Icon Size">
+			<longdesc>This specifies the size of icons displayed in toolbars</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="toolbar_style" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Toolbar Style">
+			<default type="string">
+				<stringvalue>icons</stringvalue>
+			</default>
+			<longdesc>Toolbar Style. Valid values are &quot;both&quot;, &quot;both-horiz&quot;, &quot;icons&quot;, and
+      &quot;text&quot;</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="gtk_key_theme" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="GTK+ Key Theme Name">
+			<default type="string">
+				<stringvalue>Default</stringvalue>
+			</default>
+			<longdesc>The name of the key theme RC file to load</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="font_name" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="Default font">
+			<default type="string">
+				<stringvalue>Sans 8</stringvalue>
+			</default>
+			<longdesc>The name of the default font used by gtk+</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="gtk-color-palette" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="GTK+ Color Palette">
+			<longdesc>Palette to use in the color selector.</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="theme" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="GTK+ theme">
+			<default type="string">
+				<stringvalue>Clearlooks</stringvalue>
+			</default>
+			<longdesc>GTK+ theme name.</longdesc>
+		</local_schema>
+	</entry>
+	<entry name="matchbox_theme" mtime="1520598896" type="schema" stype="string" owner="settings-daemon">
+		<local_schema locale="C" short_desc="WM theme">
+			<default type="string">
+				<stringvalue>Sato</stringvalue>
+			</default>
+			<longdesc>Matchbox Window manager theme name.</longdesc>
+		</local_schema>
+	</entry>
+</gconf>

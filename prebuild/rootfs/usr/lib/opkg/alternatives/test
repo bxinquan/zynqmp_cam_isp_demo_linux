@@ -1,0 +1,3 @@
+/usr/bin/test
+/bin/busybox 50
+/usr/bin/test.coreutils 100

@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: libnsl
+Description: Library containing NIS functions using TI-RPC (IPv6 enabled)
+Requires: libtirpc >= 1.0.1
+Version: 2.0.0
+Libs: -L/usr/lib -lnsl
+Cflags: -I/usr/include
+

@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: libarchive
+Description: library that can create and read several streaming archive formats
+Version: 3.5.1
+Cflags: -I${includedir}
+Cflags.private: -DLIBARCHIVE_STATIC
+Libs: -L${libdir} -larchive
+Libs.private: -lacl -llzo2 -llzma -lzstd -lbz2 -lz 

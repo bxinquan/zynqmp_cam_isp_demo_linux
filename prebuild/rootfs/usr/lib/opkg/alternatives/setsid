@@ -1,0 +1,3 @@
+/usr/bin/setsid
+/bin/busybox 50
+/usr/bin/setsid.util-linux 80

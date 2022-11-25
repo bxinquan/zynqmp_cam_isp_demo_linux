@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: libmicrohttpd
+Description: A library for creating an embedded HTTP server
+Version: 0.9.73
+Requires:
+Requires.private: 
+Conflicts:
+Libs: -L${libdir} -lmicrohttpd
+Libs.private: -lgnutls -lpthread 
+Cflags: -I${includedir}

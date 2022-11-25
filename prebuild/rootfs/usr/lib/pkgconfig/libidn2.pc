@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+includedir=/usr/include
+libdir=/usr/lib
+
+Name: libidn2
+Description: Library implementing IDNA2008 and TR46
+Version: 2.3.2
+Cflags: -I${includedir}
+Libs: -L${libdir} -lidn2
+Libs.private: -lunistring

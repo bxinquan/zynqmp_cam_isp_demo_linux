@@ -1,0 +1,20 @@
+debugpy<2.0,>=1.0.0
+ipython>=7.23.1
+traitlets<6.0,>=5.1.0
+jupyter_client<8.0
+tornado<7.0,>=4.2
+matplotlib-inline<0.2.0,>=0.1.0
+nest_asyncio
+
+[:platform_system == "Darwin"]
+appnope
+
+[:python_version < "3.8.0"]
+importlib-metadata<5
+argcomplete>=1.12.3
+
+[test]
+pytest!=5.3.4
+pytest-cov
+flaky
+ipyparallel

@@ -1,0 +1,3 @@
+/usr/bin/id
+/bin/busybox 50
+/usr/bin/id.coreutils 100

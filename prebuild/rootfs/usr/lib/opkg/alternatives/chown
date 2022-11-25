@@ -1,0 +1,3 @@
+/bin/chown
+/bin/busybox 50
+/bin/chown.coreutils 100

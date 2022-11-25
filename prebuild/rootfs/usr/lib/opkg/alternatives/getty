@@ -1,0 +1,3 @@
+/sbin/getty
+/bin/busybox 50
+/sbin/agetty 80

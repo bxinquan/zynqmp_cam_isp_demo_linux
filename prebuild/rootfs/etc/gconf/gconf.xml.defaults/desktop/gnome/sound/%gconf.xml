@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="event_sounds" mtime="1520598896" schema="/schemas/desktop/gnome/sound/event_sounds"/>
+	<entry name="theme_name" mtime="1520598896" schema="/schemas/desktop/gnome/sound/theme_name"/>
+</gconf>

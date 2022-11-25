@@ -1,0 +1,3 @@
+/bin/sh
+/bin/busybox 50
+/bin/bash.bash 100

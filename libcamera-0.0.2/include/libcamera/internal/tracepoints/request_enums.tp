@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+/*
+ * Copyright (C) 2020, Google Inc.
+ *
+ * request_enums.tp - Tracepoint definition for enums in the request class
+ */
+
+TRACEPOINT_ENUM(
+	libcamera,
+	request_status,
+	TP_ENUM_VALUES(
+		ctf_enum_value("RequestPending", 0)
+		ctf_enum_value("RequestComplete", 1)
+		ctf_enum_value("RequestCancelled", 2)
+	)
+)

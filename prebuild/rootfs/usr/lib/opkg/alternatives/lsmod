@@ -1,0 +1,3 @@
+/sbin/lsmod
+/bin/busybox 50
+/bin/lsmod.kmod 70

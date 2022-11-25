@@ -1,0 +1,12 @@
+LICENSE
+README.md
+setup.cfg
+setup.py
+matplotlib_inline/__init__.py
+matplotlib_inline/backend_inline.py
+matplotlib_inline/config.py
+matplotlib_inline.egg-info/PKG-INFO
+matplotlib_inline.egg-info/SOURCES.txt
+matplotlib_inline.egg-info/dependency_links.txt
+matplotlib_inline.egg-info/requires.txt
+matplotlib_inline.egg-info/top_level.txt

@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: XCB XInput
+Description: XCB XInput Extension (EXPERIMENTAL)
+Version: 1.14
+Requires.private: xcb xcb-xfixes
+Libs: -L${libdir} -lxcb-xinput
+Cflags: -I${includedir}

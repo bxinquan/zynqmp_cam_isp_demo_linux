@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: libbtrfsutil
+Description: libbtrfsutil library
+Version: 5.13.1
+URL: http://btrfs.wiki.kernel.org
+Cflags: -I${includedir}
+Libs: -L${libdir} -lbtrfsutil

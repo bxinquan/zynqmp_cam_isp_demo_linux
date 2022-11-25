@@ -1,0 +1,10 @@
+disable dnf-makecache.service
+disable dnf-makecache.timer
+disable dnf-automatic.service
+disable dnf-automatic.timer
+disable dnf-automatic-download.service
+disable dnf-automatic-download.timer
+disable dnf-automatic-install.service
+disable dnf-automatic-install.timer
+disable dnf-automatic-notifyonly.service
+disable dnf-automatic-notifyonly.timer

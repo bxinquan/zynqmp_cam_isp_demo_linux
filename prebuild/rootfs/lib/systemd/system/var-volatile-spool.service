@@ -1,0 +1,18 @@
+[Unit]
+Description=Bind mount volatile /var/spool
+DefaultDependencies=false
+Before=local-fs.target
+RequiresMountsFor=/var/volatile /var
+ConditionPathIsReadWrite=/var/volatile
+ConditionPathExists=/var/spool
+ConditionPathIsReadWrite=!/var/spool
+
+[Service]
+Type=oneshot
+RemainAfterExit=Yes
+TimeoutSec=0
+ExecStart=/sbin/mount-copybind /var/volatile/spool /var/spool
+ExecStop=/bin/umount /var/spool
+
+[Install]
+WantedBy=local-fs.target

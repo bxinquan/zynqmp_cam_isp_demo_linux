@@ -1,0 +1,9 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: xkbcommon
+Description: XKB API common to servers and clients
+Version: 1.3.0
+Libs: -L${libdir} -lxkbcommon
+Cflags: -I${includedir}

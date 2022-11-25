@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Gets file list on standard input and RPM_BUILD_ROOT as first parameter
+# and searches for omitted files (not counting directories).
+# Returns it's output on standard output.
+#
+# filon@pld.org.pl
+
+# Get build root
+RPM_BUILD_ROOT="${1}"
+
+# Handle the case where ${RPM_BUILD_ROOT} is undefined, not a directory, etc.
+if [ ! -d "${RPM_BUILD_ROOT}" ] ; then
+	cat > /dev/null
+	if [ -e "${RPM_BUILD_ROOT}" ] ; then
+		echo "Error: \`${RPM_BUILD_ROOT}' is not a directory" 1>&2
+	fi
+	exit 1
+fi
+
+# Create temporary file listing files in the manifest
+[ -n "$TMPDIR" ] || TMPDIR="/tmp"
+FILES_DISK=`mktemp "${TMPDIR}/rpmXXXXXX"`
+
+# Ensure temporary file is cleaned up when we exit
+trap "rm -f \"${FILES_DISK}\"" 0 2 3 5 10 13 15
+
+# Find non-directory files in the build root and compare to the manifest.
+# TODO: regex chars in last sed(1) expression should be escaped
+find "${RPM_BUILD_ROOT}" -type f -o -type l | LC_ALL=C sort > "${FILES_DISK}"
+LC_ALL=C sort | diff -d "${FILES_DISK}" - | sed -n 's!^\(-\|< \)'"${RPM_BUILD_ROOT}"'\(.*\)$!   \2!gp'
+

@@ -1,0 +1,4 @@
+/usr/bin/uptime
+/bin/busybox 50
+/usr/bin/uptime.procps 200
+/usr/bin/uptime.coreutils 100

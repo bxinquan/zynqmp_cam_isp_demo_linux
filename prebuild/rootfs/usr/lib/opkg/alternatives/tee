@@ -1,0 +1,3 @@
+/usr/bin/tee
+/bin/busybox 50
+/usr/bin/tee.coreutils 100

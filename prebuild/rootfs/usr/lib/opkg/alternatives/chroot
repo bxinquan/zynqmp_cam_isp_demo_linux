@@ -1,0 +1,3 @@
+/usr/sbin/chroot
+/bin/busybox 50
+/usr/sbin/chroot.coreutils 100

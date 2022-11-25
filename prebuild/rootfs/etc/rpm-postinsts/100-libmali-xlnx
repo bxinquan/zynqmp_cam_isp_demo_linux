@@ -1,0 +1,18 @@
+# libmali-xlnx - postinst
+#!/bin/sh
+set -e
+
+if [ -n "$D" ]; then
+    $INTERCEPT_DIR/postinst_intercept delay_to_first_boot libmali-xlnx mlprefix=
+    exit 0
+fi
+#!/bin/sh
+rm /usr/lib/libMali.so.9.0
+
+	update-alternatives --install /usr/lib/libMali.so.9.0 libmali-xlnx /usr/lib/x11/libMali.so.9.0 20
+
+	update-alternatives --install /usr/lib/libMali.so.9.0 libmali-xlnx /usr/lib/fbdev/libMali.so.9.0 10
+
+	update-alternatives --install /usr/lib/libMali.so.9.0 libmali-xlnx /usr/lib/wayland/libMali.so.9.0 10
+
+	update-alternatives --install /usr/lib/libMali.so.9.0 libmali-xlnx /usr/lib/headless/libMali.so.9.0 15

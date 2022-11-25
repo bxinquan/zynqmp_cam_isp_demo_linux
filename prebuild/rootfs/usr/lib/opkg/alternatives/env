@@ -1,0 +1,3 @@
+/usr/bin/env
+/bin/busybox 50
+/usr/bin/env.coreutils 100

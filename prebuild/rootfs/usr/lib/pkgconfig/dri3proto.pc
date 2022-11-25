@@ -1,0 +1,7 @@
+prefix=/usr
+includedir=${prefix}/include
+ 
+Name: DRI3Proto
+Description: DRI3 extension headers
+Version: 1.2
+Cflags: -I${includedir}

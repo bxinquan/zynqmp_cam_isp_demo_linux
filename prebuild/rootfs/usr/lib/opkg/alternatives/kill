@@ -1,0 +1,5 @@
+/bin/kill
+/bin/busybox 50
+/bin/kill.procps 200
+/bin/kill.coreutils 100
+/bin/kill.util-linux 80

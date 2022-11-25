@@ -1,0 +1,59 @@
+Metadata-Version: 2.1
+Name: ipykernel
+Version: 6.6.1
+Summary: IPython Kernel for Jupyter
+Home-page: https://ipython.org
+Author: IPython Development Team
+Author-email: ipython-dev@scipy.org
+License: BSD
+Keywords: Interactive,Interpreter,Shell,Web
+Platform: Linux
+Platform: Mac OS X
+Platform: Windows
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Provides-Extra: test
+License-File: COPYING.md
+
+# IPython Kernel for Jupyter
+
+This package provides the IPython kernel for Jupyter.
+
+## Installation from source
+
+1. `git clone`
+2. `cd ipykernel`
+3. `pip install -e ".[test]"`
+
+After that, all normal `ipython` commands will use this newly-installed version of the kernel.
+
+## Running tests
+
+Follow the instructions from `Installation from source`.
+
+and then from the root directory
+
+```bash
+pytest ipykernel
+```
+
+## Running tests with coverage
+
+Follow the instructions from `Installation from source`.
+
+and then from the root directory
+
+```bash
+pytest ipykernel -vv -s --cov ipykernel --cov-branch --cov-report term-missing:skip-covered --durations 10
+```
+
+

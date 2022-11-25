@@ -1,0 +1,23 @@
+[Unit]
+Description=NFS server and services
+DefaultDependencies=no
+Requires=network.target proc-fs-nfsd.mount
+Requires=nfs-mountd.service
+Wants=rpcbind.service
+After=local-fs.target
+After=network.target proc-fs-nfsd.mount rpcbind.service nfs-mountd.service
+ConditionPathExists=/etc/exports
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/nfs-utils.conf
+ExecStartPre=/usr/sbin/exportfs -r
+ExecStart=/usr/sbin/rpc.nfsd $NFSD_OPTS $NFSD_COUNT
+ExecStop=/usr/sbin/rpc.nfsd 0
+ExecStopPost=/usr/sbin/exportfs -au
+ExecStopPost=/usr/sbin/exportfs -f
+ExecReload=/usr/sbin/exportfs -r
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

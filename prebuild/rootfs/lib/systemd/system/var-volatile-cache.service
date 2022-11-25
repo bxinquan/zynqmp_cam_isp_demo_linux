@@ -1,0 +1,18 @@
+[Unit]
+Description=Bind mount volatile /var/cache
+DefaultDependencies=false
+Before=local-fs.target
+RequiresMountsFor=/var/volatile /var
+ConditionPathIsReadWrite=/var/volatile
+ConditionPathExists=/var/cache
+ConditionPathIsReadWrite=!/var/cache
+
+[Service]
+Type=oneshot
+RemainAfterExit=Yes
+TimeoutSec=0
+ExecStart=/sbin/mount-copybind /var/volatile/cache /var/cache
+ExecStop=/bin/umount /var/cache
+
+[Install]
+WantedBy=local-fs.target

@@ -1,0 +1,3 @@
+/usr/sbin/rfkill
+/bin/busybox 50
+/usr/sbin/rfkill.util-linux 80

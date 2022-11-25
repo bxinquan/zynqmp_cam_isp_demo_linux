@@ -1,0 +1,4 @@
+#!/bin/sh
+echo 'ERROR: /usr/bin/ncursesw6-config should not be used, use an alternative such as pkg-config' >&2
+echo '--should-not-have-used-/usr/bin/ncursesw6-config'
+exit 1

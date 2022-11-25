@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+README.rst
+nest_asyncio.py
+pyproject.toml
+setup.cfg
+setup.py
+nest_asyncio.egg-info/PKG-INFO
+nest_asyncio.egg-info/SOURCES.txt
+nest_asyncio.egg-info/dependency_links.txt
+nest_asyncio.egg-info/top_level.txt
+tests/__init__.py
+tests/nest_test.py

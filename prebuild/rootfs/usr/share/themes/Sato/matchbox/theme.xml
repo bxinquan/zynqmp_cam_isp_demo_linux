@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<theme name="Clearlooks" author="Matthew Allum - mallum@handhelds.org"
+       desc="A version of clearlooks for mb" version="1.0" engine_version="1" >
+
+<color id="white" def="#ffffff" />
+<color id="black" def="#000000" />
+
+<color id="text" def="#2e3436" />
+<color id="base" def="#66cc33" />
+<color id="divider" def="#a1a1a1" />
+<color id="dia-border" def="#383838" />
+<color id="titlebar" def="#f2f2f2" />
+
+<font id="titlefont" def="Sans bold 18px" />
+<font id="menufont" def="Sans bold 24px" />
+
+<pixmap id="close-button" filename="close-button.png" />
+<pixmap id="close-button-active" filename="close-button-active.png" />
+<pixmap id="dia-left-edge" filename="dia-left-edge.png" />
+<pixmap id="dia-right-edge" filename="dia-right-edge.png" />  
+<pixmap id="dia-tile" filename="dia-tile.png" />
+<pixmap id="open-menu" filename="open-menu.png" />
+<pixmap id="open-menu-active" filename="open-menu-active.png" />
+
+
+<frame id="main" height="32">
+
+  <layer x="0" y="0" w="100%"  h="100%" 
+   type="plain" color="base" />
+
+  <layer x="0" y="0" w="100%"  h="1"
+   type="plain" color="divider" />
+
+  <layer x="0" y="1" w="100%"  h="30"
+   type="plain" color="titlebar" />
+
+  <layer x="0" y="31" w="100%"  h="1"
+   type="plain" color="divider" />
+
+  <button x="0" y="0" w="32" h="32" action="custom">
+      <active pixmap="open-menu-active"/>
+      <inactive pixmap="open-menu"/>
+  </button>
+
+  <layer x="40" y="8" w="100%-320" h="20" 
+   type="label" color="text" justify="left" font="titlefont" />
+
+  <button x="40" y="0" w="100%-340" h="32" action="custom" options="inputonly"/>
+
+  <button x="100%-32" y="0" w="32" h="32" action="close" >
+   <active pixmap="close-button-active"/>
+   <inactive pixmap="close-button"  />
+  </button>
+
+  <panel x="100%-324" y="0" w="260" h="48" />
+
+</frame>
+
+<frame id="main-west"  width="0" >
+</frame>
+
+<frame id="main-east"  width="0" >
+</frame>
+
+<frame id="main-south" height="0" >
+</frame>
+
+<frame id="dialog" height="32" >
+  <layer x="0" y="0" w="100%"  h="32" 
+   type="plain" color="titlebar" />
+
+  <layer x="0" y="0" w="100%"  h="1"
+   type="plain" color="divider" />
+
+  <layer x="12" y="8" w="100%-100" h="20" 
+   type="label" color="text" justify="left" font="titlefont" />
+
+  <layer x="0" y="31" w="100%"  h="1"
+   type="plain" color="divider" />
+
+  <layer x="0" y="0" w="1"  h="32"
+   type="plain" color="divider" />
+
+  <layer x="100%-1" y="0" w="1"  h="32"
+   type="plain" color="divider" />
+
+  <button x="100%-32" y="0" w="32" h="32" action="close" >
+   <active pixmap="close-button-active" />
+   <inactive pixmap="close-button"  />
+  </button>
+</frame>
+
+<frame id="dialog-north" height="1" options="shaped">
+  <layer x="0" y="0" w="100%"  h="100%" 
+   type="plain" color="dia-border" />
+</frame>
+
+<frame id="dialog-east" width="1" >
+  <layer x="0" y="0" w="100%"  h="100%" 
+   type="plain" color="dia-border" />
+</frame>
+
+<frame id="dialog-west" width="1" >
+  <layer x="0" y="0" w="100%"  h="100%" 
+   type="plain" color="dia-border" />
+</frame>
+
+<frame id="dialog-south" height="1" >
+  <layer x="0" y="0" w="100%"  h="100%" 
+   type="plain" color="dia-border" />
+
+</frame>
+
+</theme>

@@ -1,0 +1,3 @@
+/usr/bin/strings
+/bin/busybox 50
+/usr/bin/aarch64-xilinx-linux-strings 100

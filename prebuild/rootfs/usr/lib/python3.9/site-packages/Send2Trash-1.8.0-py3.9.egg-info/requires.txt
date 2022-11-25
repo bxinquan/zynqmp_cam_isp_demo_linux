@@ -1,0 +1,18 @@
+
+[nativeLib]
+
+[nativeLib:sys_platform == "darwin"]
+pyobjc-framework-Cocoa
+
+[nativeLib:sys_platform == "win32"]
+pywin32
+
+[objc]
+
+[objc:sys_platform == "darwin"]
+pyobjc-framework-Cocoa
+
+[win32]
+
+[win32:sys_platform == "win32"]
+pywin32

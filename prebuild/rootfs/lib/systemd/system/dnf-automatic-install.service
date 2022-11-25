@@ -1,0 +1,13 @@
+[Unit]
+Description=dnf automatic install updates
+# See comment in dnf-makecache.service
+ConditionPathExists=!/run/ostree-booted
+After=network-online.target
+
+[Service]
+Type=oneshot
+Nice=19
+IOSchedulingClass=2
+IOSchedulingPriority=7
+Environment="ABRT_IGNORE_PYTHON=1"
+ExecStart=/usr/bin/dnf-automatic /etc/dnf/automatic.conf --timer --installupdates

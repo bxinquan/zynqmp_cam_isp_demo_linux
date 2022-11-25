@@ -1,0 +1,2 @@
+/sbin/shutdown
+/bin/systemctl 300

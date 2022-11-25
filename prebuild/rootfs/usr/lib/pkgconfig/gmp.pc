@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+includedir=/usr/include
+libdir=/usr/lib
+
+Name: GNU MP
+Description: GNU Multiple Precision Arithmetic Library
+URL: https://gmplib.org
+Version: 6.2.1
+Cflags: -I${includedir}
+Libs: -L${libdir} -lgmp

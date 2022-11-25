@@ -1,0 +1,10 @@
+
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name:		libiptc
+Description:	iptables v4/v6 ruleset ADT and kernel interface
+Version:	1.8.7
+Requires:	libip4tc libip6tc

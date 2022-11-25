@@ -1,0 +1,13 @@
+LICENSE
+README.md
+setup.cfg
+setup.py
+jupyterlab_pygments/__init__.py
+jupyterlab_pygments/_version.py
+jupyterlab_pygments/style.py
+jupyterlab_pygments.egg-info/PKG-INFO
+jupyterlab_pygments.egg-info/SOURCES.txt
+jupyterlab_pygments.egg-info/dependency_links.txt
+jupyterlab_pygments.egg-info/not-zip-safe
+jupyterlab_pygments.egg-info/requires.txt
+jupyterlab_pygments.egg-info/top_level.txt

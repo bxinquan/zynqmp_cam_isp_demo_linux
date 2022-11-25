@@ -1,0 +1,3 @@
+[console_scripts]
+jupyter-execute = nbclient.cli:main
+

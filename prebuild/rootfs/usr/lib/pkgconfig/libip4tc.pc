@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name:		libip4tc
+Description:	iptables IPv4 ruleset ADT and kernel interface
+Version:	1.8.7
+Libs:		-L${libdir} -lip4tc
+Cflags:		-I${includedir}

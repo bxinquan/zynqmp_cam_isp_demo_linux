@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# If using normal root, avoid changing anything.
+if [ -z "$RPM_BUILD_ROOT" ] || [ "$RPM_BUILD_ROOT" = "/" ]; then
+	exit 0
+fi
+
+PREFIX=${1:-/usr}
+
+cd "$RPM_BUILD_ROOT"
+
+# Compress man pages
+COMPRESS=${COMPRESS:-gzip -9 -n}
+COMPRESS_EXT=${COMPRESS_EXT:-.gz}
+
+for d in .${PREFIX}/man/man* .${PREFIX}/man/*/man* .${PREFIX}/info \
+	.${PREFIX}/share/man/man* .${PREFIX}/share/man/*/man* \
+	.${PREFIX}/share/info .${PREFIX}/kerberos/man \
+	.${PREFIX}/X11R6/man/man* .${PREFIX}/lib/perl5/man/man* \
+	.${PREFIX}/share/doc/*/man/man* .${PREFIX}/lib/*/man/man* \
+	.${PREFIX}/share/fish/man/man*
+do
+    [ -d $d ] || continue
+    for f in `find $d -type f ! -name dir`
+    do
+        [ -f "$f" ] || continue
+
+	case "$f" in
+	 *.gz|*.Z)    gunzip  -f $f; b=`echo $f | sed -e 's/\.\(gz\|Z\)$//'`;;
+	 *.bz2)       bunzip2 -f $f; b=`echo $f | sed -e 's/\.bz2$//'`;;
+	 *.xz|*.lzma) unxz    -f $f; b=`echo $f | sed -e 's/\.\(xz\|lzma\)$//'`;;
+	 *.zst|*.zstd) unzstd -f --rm $f; b=`echo $f | sed -e 's/\.\(zst\|zstd\)$//'`;;
+	 *) b=$f;;
+	esac
+
+	$COMPRESS $b </dev/null 2>/dev/null || {
+	    inode=`ls -i $b | awk '{ print $1 }'`
+	    others=`find $d -type f -inum $inode`
+	    if [ -n "$others" ]; then
+		for afile in $others ; do
+		    [ "$afile" != "$b" ] && rm -f $afile
+		done
+		$COMPRESS -f $b
+		for afile in $others ; do
+		    [ "$afile" != "$b" ] && ln $b$COMPRESS_EXT $afile$COMPRESS_EXT
+		done
+	    else
+		$COMPRESS -f $b
+	    fi
+	}
+    done
+
+    for f in `find $d -type l`
+    do
+	l=`ls -l $f | sed -e 's/.* -> //' -e 's/\.\(gz\|Z\|bz2\|xz\|lzma\|zst\|zstd\)$//'`
+	rm -f $f
+	b=`echo $f | sed -e 's/\.\(gz\|Z\|bz2\|xz\|lzma\|zst\|zstd\)$//'`
+	ln -sf $l$COMPRESS_EXT $b$COMPRESS_EXT
+    done
+done

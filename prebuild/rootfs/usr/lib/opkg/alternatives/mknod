@@ -1,0 +1,3 @@
+/bin/mknod
+/bin/busybox 50
+/bin/mknod.coreutils 100

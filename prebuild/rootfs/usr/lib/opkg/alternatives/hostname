@@ -1,0 +1,3 @@
+/bin/hostname
+/bin/busybox 50
+/bin/hostname.coreutils 90

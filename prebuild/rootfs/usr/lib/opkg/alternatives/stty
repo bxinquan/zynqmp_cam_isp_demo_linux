@@ -1,0 +1,3 @@
+/bin/stty
+/bin/busybox 50
+/bin/stty.coreutils 100

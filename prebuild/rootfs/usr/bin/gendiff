@@ -1,0 +1,21 @@
+#!/bin/sh
+
+[ -z "$1" ] || [ -z "$2" ] && {
+# usage
+  echo "usage: $0 <directory> <diff-extension>" 1>&2
+  exit 1
+}
+
+: ${DIFF:=diff}
+: ${GENDIFF_DIFF_ARGS:=-up}
+: ${GENDIFF_DIFF_CHANGELOG_ARGS:=-U0}
+
+find $1 \( -name "*$2" -o -name ".*$2" \) -print | sort |
+while read f; do
+    U="${GENDIFF_DIFF_ARGS}"
+    [ "`basename $f`" = "ChangeLog$2" ] && U="${GENDIFF_DIFF_CHANGELOG_ARGS}"
+    F=/dev/null
+    [ -r "${f}" ] && F="${f}"
+    echo "${DIFF} ${U} ${F} ${f%$2}"
+    ${DIFF} ${U} "${F}" "${f%$2}"
+done

@@ -1,0 +1,3 @@
+
+[:python_version < "3.2"]
+backports.functools-lru-cache>=1.2.1

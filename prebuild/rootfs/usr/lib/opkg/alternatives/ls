@@ -1,0 +1,3 @@
+/bin/ls
+/bin/busybox 50
+/bin/ls.coreutils 100

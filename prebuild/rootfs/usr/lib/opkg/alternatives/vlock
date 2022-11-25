@@ -1,0 +1,3 @@
+/usr/bin/vlock
+/bin/busybox 50
+/usr/bin/vlock.kbd 100

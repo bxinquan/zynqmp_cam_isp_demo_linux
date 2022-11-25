@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: XCB DRI3
+Description: XCB DRI3 Extension
+Version: 1.14
+Requires.private: xcb
+Libs: -L${libdir} -lxcb-dri3
+Cflags: -I${includedir}

@@ -1,0 +1,3 @@
+/bin/rmdir
+/bin/busybox 50
+/bin/rmdir.coreutils 100

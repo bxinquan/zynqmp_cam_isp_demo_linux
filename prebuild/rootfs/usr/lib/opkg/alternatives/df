@@ -1,0 +1,3 @@
+/bin/df
+/bin/busybox 50
+/usr/bin/df.coreutils 100

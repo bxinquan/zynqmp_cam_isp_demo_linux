@@ -1,0 +1,3 @@
+/bin/dd
+/bin/busybox 50
+/bin/dd.coreutils 100

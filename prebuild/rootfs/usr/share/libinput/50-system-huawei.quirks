@@ -1,0 +1,7 @@
+# Clickpad that announces BTN_RIGHT
+# https://bugzilla.redhat.com/show_bug.cgi?id=1972370
+[Huawei MateBook 2020 Touchpad]
+MatchName=ELAN2604:00 04F3:3114 Touchpad
+MatchUdevType=touchpad
+MatchDMIModalias=dmi:*svnHUAWEI:*pvrM1010*
+AttrEventCodeDisable=BTN_RIGHT

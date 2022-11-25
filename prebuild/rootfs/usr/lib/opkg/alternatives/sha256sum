@@ -1,0 +1,3 @@
+/usr/bin/sha256sum
+/bin/busybox 50
+/usr/bin/sha256sum.coreutils 100

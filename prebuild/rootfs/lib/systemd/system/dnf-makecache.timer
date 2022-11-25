@@ -1,0 +1,15 @@
+[Unit]
+Description=dnf makecache --timer
+ConditionKernelCommandLine=!rd.live.image
+# See comment in dnf-makecache.service
+ConditionPathExists=!/run/ostree-booted
+Wants=network-online.target
+
+[Timer]
+OnBootSec=10min
+OnUnitInactiveSec=1h
+RandomizedDelaySec=60m
+Unit=dnf-makecache.service
+
+[Install]
+WantedBy=timers.target

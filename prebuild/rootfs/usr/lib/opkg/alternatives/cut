@@ -1,0 +1,3 @@
+/usr/bin/cut
+/bin/busybox 50
+/usr/bin/cut.coreutils 100

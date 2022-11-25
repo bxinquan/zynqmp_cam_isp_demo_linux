@@ -1,0 +1,2 @@
+libgioopenssl.so: gio-tls-backend
+libgsettingsgconfbackend.so: gsettings-backend

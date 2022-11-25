@@ -1,0 +1,3 @@
+/usr/bin/rev
+/bin/busybox 50
+/usr/bin/rev.util-linux 80

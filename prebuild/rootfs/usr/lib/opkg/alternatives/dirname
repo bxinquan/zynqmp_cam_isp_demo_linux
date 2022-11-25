@@ -1,0 +1,3 @@
+/usr/bin/dirname
+/bin/busybox 50
+/usr/bin/dirname.coreutils 100

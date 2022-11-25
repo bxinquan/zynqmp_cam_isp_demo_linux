@@ -1,0 +1,7 @@
+
+[optional]
+python-socks
+wsaccel
+
+[test]
+websockets

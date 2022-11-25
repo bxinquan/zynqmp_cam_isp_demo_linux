@@ -1,0 +1,43 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
+module ipa.test;
+
+enum IPAOperationCode {
+	IPAOperationNone,
+	IPAOperationInit,
+	IPAOperationStart,
+	IPAOperationStop,
+};
+
+[scopedEnum] enum ErrorFlags {
+	Error1 = 0x1,
+	Error2 = 0x2,
+	Error3 = 0x4,
+	Error4 = 0x8,
+};
+
+struct IPASettings {};
+
+struct TestStruct {
+	map<string, string> m;
+	array<string> a;
+	string s1;
+	string s2;
+	int32 i;
+	string s3;
+	IPAOperationCode c;
+	ErrorFlags e;
+	[flags] ErrorFlags f;
+};
+
+interface IPATestInterface {
+	init(IPASettings settings) => (int32 ret);
+	start() => (int32 ret);
+	stop();
+
+	test(TestStruct s);
+};
+
+interface IPATestEventInterface {
+	dummyEvent(uint32 val);
+};

@@ -1,0 +1,35 @@
+idna>=2.8
+sniffio>=1.1
+
+[:python_version < "3.7"]
+contextvars
+dataclasses
+
+[:python_version < "3.8"]
+typing_extensions
+
+[doc]
+sphinx_rtd_theme
+sphinx-autodoc-typehints>=1.2.0
+
+[test]
+coverage[toml]>=4.5
+hypothesis>=4.0
+pytest>=6.0
+pytest-mock>=3.6.1
+trustme
+
+[test:python_version < "3.7"]
+contextlib2
+
+[test:python_version < "3.7" and (platform_python_implementation == "CPython" and platform_system != "Windows")]
+uvloop<0.15
+
+[test:python_version < "3.8"]
+mock>=4
+
+[test:python_version >= "3.7" and (platform_python_implementation == "CPython" and platform_system != "Windows")]
+uvloop>=0.15
+
+[trio]
+trio>=0.16

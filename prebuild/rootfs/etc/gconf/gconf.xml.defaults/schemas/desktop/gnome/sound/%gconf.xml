@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="event_sounds" mtime="1520598896" type="schema" stype="bool" owner="gnome">
+		<local_schema locale="C" short_desc="Enable Sound Events">
+			<default type="bool" value="true"/>
+		</local_schema>
+	</entry>
+	<entry name="theme_name" mtime="1520598896" type="schema" stype="string" owner="gnome">
+		<local_schema locale="C" short_desc="Sound Theme Name">
+			<default type="string">
+				<stringvalue>freedesktop</stringvalue>
+			</default>
+		</local_schema>
+	</entry>
+</gconf>

@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: ocl-icd
+Description: Open Computing Language generic Installable Client Driver support
+Version: 2.3.0
+Libs: -L${libdir}
+Cflags: -I${includedir}

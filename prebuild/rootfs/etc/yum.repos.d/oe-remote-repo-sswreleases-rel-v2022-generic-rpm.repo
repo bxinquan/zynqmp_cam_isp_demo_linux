@@ -1,0 +1,70 @@
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-all]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm all
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/all
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-any]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm any
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/any
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-noarch]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm noarch
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/noarch
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-aarch64]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm aarch64
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/aarch64
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-armv8a]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm armv8a
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/armv8a
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-armv8a_crc]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm armv8a_crc
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/armv8a_crc
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-cortexa72_cortexa53]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm cortexa72_cortexa53
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/cortexa72_cortexa53
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-zynqmp]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm zynqmp
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/zynqmp
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-zynqmp_ev]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm zynqmp_ev
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/zynqmp_ev
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-zynqmp_generic]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm zynqmp_generic
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/zynqmp_generic
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-zynqmp_eg]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm zynqmp_eg
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/zynqmp_eg
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-zynqmp_ev]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm zynqmp_ev
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/zynqmp_ev
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-zynqmp_dr]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm zynqmp_dr
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/zynqmp_dr
+gpgcheck=0
+
+[oe-remote-repo-sswreleases-rel-v2022-generic-rpm-zynqmp_cg]
+name=OE Remote Repo: sswreleases rel-v2022 generic rpm zynqmp_cg
+baseurl=http://petalinux.xilinx.com/sswreleases/rel-v2022/generic/rpm/zynqmp_cg
+gpgcheck=0
+

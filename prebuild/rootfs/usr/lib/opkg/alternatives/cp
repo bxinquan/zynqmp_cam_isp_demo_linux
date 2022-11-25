@@ -1,0 +1,3 @@
+/bin/cp
+/bin/busybox 50
+/bin/cp.coreutils 100

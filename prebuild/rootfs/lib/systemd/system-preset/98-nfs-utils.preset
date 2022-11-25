@@ -1,0 +1,2 @@
+enable nfs-server.service
+enable nfs-mountd.service

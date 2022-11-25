@@ -1,0 +1,3 @@
+/bin/ln
+/bin/busybox 50
+/bin/ln.coreutils 100

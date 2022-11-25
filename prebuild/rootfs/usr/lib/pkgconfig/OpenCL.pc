@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: OpenCL
+Description: Open Computing Language generic Installable Client Driver Loader
+Version: 3.0
+Libs: -L${libdir} -lOpenCL
+Cflags: -I${includedir}

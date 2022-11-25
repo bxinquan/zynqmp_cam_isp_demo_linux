@@ -1,0 +1,13 @@
+# zocl - postinst
+#!/bin/sh
+set -e
+
+if [ -n "$D" ]; then
+    $INTERCEPT_DIR/postinst_intercept delay_to_first_boot zocl mlprefix=
+    exit 0
+fi
+  #!/bin/sh
+  echo "Unloading old XRT Linux kernel modules"
+  ( rmmod zocl || true ) > /dev/null 2>&1
+  echo "Loading new XRT Linux kernel modules"
+  modprobe zocl

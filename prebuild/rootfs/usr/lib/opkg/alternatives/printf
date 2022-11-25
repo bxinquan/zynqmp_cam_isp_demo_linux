@@ -1,0 +1,3 @@
+/usr/bin/printf
+/bin/busybox 50
+/usr/bin/printf.coreutils 100

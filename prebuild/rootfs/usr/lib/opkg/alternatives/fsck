@@ -1,0 +1,3 @@
+/sbin/fsck
+/bin/busybox 50
+/sbin/fsck.util-linux 80

@@ -1,0 +1,3 @@
+/usr/bin/md5sum
+/bin/busybox 50
+/usr/bin/md5sum.coreutils 100

@@ -1,0 +1,30 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+/*
+ * Copyright (C) 2022, Tomi Valkeinen <tomi.valkeinen@ideasonboard.com>
+ *
+ * Python bindings - Auto-generated controls
+ *
+ * This file is auto-generated. Do not edit.
+ */
+
+#include <libcamera/control_ids.h>
+
+#include <pybind11/smart_holder.h>
+
+namespace py = pybind11;
+
+class PyControls
+{
+};
+
+class PyDraftControls
+{
+};
+
+void init_py_controls_generated(py::module& m)
+{
+	auto controls = py::class_<PyControls>(m, "controls");
+	auto draft = py::class_<PyDraftControls>(controls, "draft");
+
+${controls}
+}

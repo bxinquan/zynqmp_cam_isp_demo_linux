@@ -1,0 +1,3 @@
+/bin/getopt
+/bin/busybox 50
+/bin/getopt.util-linux 80

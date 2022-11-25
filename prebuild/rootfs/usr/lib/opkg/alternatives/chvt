@@ -1,0 +1,3 @@
+/usr/bin/chvt
+/bin/busybox 50
+/usr/bin/chvt.kbd 100

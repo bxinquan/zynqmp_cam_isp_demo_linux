@@ -1,0 +1,3 @@
+/usr/bin/chsh
+/usr/bin/chsh.shadow 200
+/usr/bin/chsh.util-linux 80

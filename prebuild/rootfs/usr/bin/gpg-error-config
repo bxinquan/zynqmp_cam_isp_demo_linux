@@ -1,0 +1,4 @@
+#!/bin/sh
+echo 'ERROR: /usr/bin/gpg-error-config should not be used, use an alternative such as pkg-config' >&2
+echo '--should-not-have-used-/usr/bin/gpg-error-config'
+exit 1

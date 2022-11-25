@@ -1,0 +1,4 @@
+#!/bin/sh
+echo 'ERROR: /usr/bin/ncursesw5-config should not be used, use an alternative such as pkg-config' >&2
+echo '--should-not-have-used-/usr/bin/ncursesw5-config'
+exit 1

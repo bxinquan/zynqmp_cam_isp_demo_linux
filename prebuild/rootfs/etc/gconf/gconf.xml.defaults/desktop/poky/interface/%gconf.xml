@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="gtk-scrolled-window-placement" mtime="1520598896" schema="/schemas/desktop/poky/interface/gtk-scrolled-window-placement"/>
+	<entry name="gtk-im-status-style" mtime="1520598896" schema="/schemas/desktop/poky/interface/gtk-im-status-style"/>
+	<entry name="gtk-im-preedit-style" mtime="1520598896" schema="/schemas/desktop/poky/interface/gtk-im-preedit-style"/>
+	<entry name="touchscreen" mtime="1520598896" schema="/schemas/desktop/poky/interface/touchscreen" type="bool" value="true"/>
+	<entry name="menus_have_icons" mtime="1520598896" schema="/schemas/desktop/poky/interface/menus_have_icons"/>
+	<entry name="file_chooser_backend" mtime="1520598896" schema="/schemas/desktop/poky/interface/file_chooser_backend"/>
+	<entry name="icon_theme" mtime="1520598896" schema="/schemas/desktop/poky/interface/icon_theme" type="string">
+		<stringvalue>Sato</stringvalue>
+	</entry>
+	<entry name="cursor_blink_time" mtime="1520598896" schema="/schemas/desktop/poky/interface/cursor_blink_time"/>
+	<entry name="cursor_blink" mtime="1520598896" schema="/schemas/desktop/poky/interface/cursor_blink"/>
+	<entry name="can_change_accels" mtime="1520598896" schema="/schemas/desktop/poky/interface/can_change_accels"/>
+	<entry name="toolbar_icon_size" mtime="1520598896" schema="/schemas/desktop/poky/interface/toolbar_icon_size"/>
+	<entry name="toolbar_style" mtime="1520598896" schema="/schemas/desktop/poky/interface/toolbar_style"/>
+	<entry name="gtk_key_theme" mtime="1520598896" schema="/schemas/desktop/poky/interface/gtk_key_theme"/>
+	<entry name="font_name" mtime="1520598896" schema="/schemas/desktop/poky/interface/font_name" type="string">
+		<stringvalue>Sans 9</stringvalue>
+	</entry>
+	<entry name="gtk-color-palette" mtime="1520598896" schema="/schemas/desktop/poky/interface/gtk-color-palette"/>
+	<entry name="theme" mtime="1520598896" schema="/schemas/desktop/poky/interface/theme" type="string">
+		<stringvalue>Adwaita</stringvalue>
+	</entry>
+	<entry name="matchbox_theme" mtime="1520598896" schema="/schemas/desktop/poky/interface/matchbox_theme" type="string">
+		<stringvalue>Sato</stringvalue>
+	</entry>
+</gconf>

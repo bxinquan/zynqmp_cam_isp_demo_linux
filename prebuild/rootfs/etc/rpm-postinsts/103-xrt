@@ -1,0 +1,18 @@
+# xrt - postinst
+#!/bin/sh
+set -e
+if [ x"$D" = "x" ]; then
+	if [ -x /sbin/ldconfig ]; then /sbin/ldconfig ; fi
+fi
+
+if [ -n "$D" ]; then
+    $INTERCEPT_DIR/postinst_intercept delay_to_first_boot xrt mlprefix=
+    exit 0
+fi
+  #!/bin/sh
+  if [ ! -e /etc/OpenCL/vendors/xilinx.icd ]; then
+	echo "INFO: Creating ICD entry for Xilinx Platform"
+	mkdir -p /etc/OpenCL/vendors
+	echo "libxilinxopencl.so" > /etc/OpenCL/vendors/xilinx.icd
+	chmod -R 755 /etc/OpenCL
+  fi

@@ -1,0 +1,3 @@
+/sbin/nologin
+/sbin/nologin.shadow 200
+/sbin/nologin.util-linux 80

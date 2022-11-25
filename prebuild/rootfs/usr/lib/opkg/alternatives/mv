@@ -1,0 +1,3 @@
+/bin/mv
+/bin/busybox 50
+/bin/mv.coreutils 100

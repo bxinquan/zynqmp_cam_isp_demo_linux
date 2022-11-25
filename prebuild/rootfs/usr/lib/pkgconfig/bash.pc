@@ -1,0 +1,28 @@
+# bash.pc.in
+
+prefix=/usr
+exec_prefix=/usr
+includedir=/usr/include
+libdir=/usr/lib
+
+loadablesdir=${libdir}/bash
+headersdir=${includedir}/bash
+
+LOCAL_CFLAGS = 
+LOCAL_DEFS = -DSHELL
+CCFLAGS = ${LOCAL_DEFS} ${LOCAL_CFLAGS}
+
+CC = aarch64-xilinx-linux-gcc  -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -Wdate-time 
+SHOBJ_CC = aarch64-xilinx-linux-gcc -mcpu=cortex-a72.cortex-a53 -march=armv8-a+crc -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -Wdate-time 
+SHOBJ_CFLAGS = -fPIC
+SHOBJ_LD = ${CC}
+SHOBJ_LDFLAGS = -shared -Wl,-soname,$@
+SHOBJ_XLDFLAGS = 
+SHOBJ_LIBS = 
+
+Name: bash
+Description: Bash headers for bash loadable builtins
+Version: 5.1-release
+Url: 
+Libs: ${SHOBJ_LIBS}
+Cflags: ${SHOBJ_CFLAGS} ${CCFLAGS} -I${headersdir} -I${headersdir}/builtins -I${headersdir}/include

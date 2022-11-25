@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<gconfschemafile>
+<schemalist>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/matchbox_theme</key>
+    <applyto>/desktop/poky/interface/matchbox_theme</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <default>Sato</default>
+    <locale name="C">
+      <short>WM theme</short>
+      <long>Matchbox Window manager theme name.</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/theme</key>
+    <applyto>/desktop/poky/interface/theme</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <default>Clearlooks</default>
+    <locale name="C">
+      <short>GTK+ theme</short>
+      <long>GTK+ theme name.</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/gtk-color-palette</key>
+    <applyto>/desktop/poky/interface/gtk-color-palette</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <locale name="C">
+      <short>GTK+ Color Palette</short>
+      <long>Palette to use in the color selector.</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/font_name</key>
+    <applyto>/desktop/poky/interface/font_name</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <default>Sans 8</default>
+    <locale name="C">
+      <short>Default font</short>
+      <long>The name of the default font used by gtk+</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/gtk_key_theme</key>
+    <applyto>/desktop/poky/interface/gtk_key_theme</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <default>Default</default>
+    <locale name="C">
+      <short>GTK+ Key Theme Name</short>
+      <long>The name of the key theme RC file to load</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/toolbar_style</key>
+    <applyto>/desktop/poky/interface/toolbar_style</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <default>icons</default>
+    <locale name="C">
+      <short>Toolbar Style</short>
+      <long>Toolbar Style. Valid values are "both", "both-horiz", "icons", and
+      "text"</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/toolbar_icon_size</key>
+    <applyto>/desktop/poky/interface/toolbar_icon_size</applyto>
+    <type>int</type>
+    <owner>settings-daemon</owner>
+    <locale name="C">
+      <short>Toolbar Icon Size</short>
+      <long>This specifies the size of icons displayed in toolbars</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/can_change_accels</key>
+    <applyto>/desktop/poky/interface/can_change_accels</applyto>
+    <type>bool</type>
+    <owner>settings-daemon</owner>
+    <default>false</default>
+    <locale name="C">
+      <short>Can Change Accels</short>
+      <long>Whether the user can dynamically type a new accelerator when
+      positioned over an active menuitem</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/cursor_blink</key>
+    <applyto>/desktop/poky/interface/cursor_blink</applyto>
+    <type>bool</type>
+    <owner>settings-daemon</owner>
+    <default>true</default>
+    <locale name="C">
+      <short>Can Change Accels</short>
+      <long>Whether the cursor should blink</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/cursor_blink_time</key>
+    <applyto>/desktop/poky/interface/cursor_blink_time</applyto>
+    <type>int</type>
+    <owner>settings-daemon</owner>
+    <default>1200</default>
+    <locale name="C">
+      <short>Cursor Blink Time</short>
+      <long>Length of the cursor blink cycle, in milliseconds</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/icon_theme</key>
+    <applyto>/desktop/poky/interface/icon_theme</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <default>Sato</default>
+    <locale name="C">
+      <short>Icon Theme</short>
+      <long>The name of the icon theme to use in applications</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/file_chooser_backend</key>
+    <applyto>/desktop/poky/interface/file_chooser_backend</applyto>
+    <type>string</type>
+    <owner>settings-daemon</owner>
+    <locale name="C">
+      <short>Module for GtkFileChooser</short>
+      <long>Module to use as the filesystem model for the
+      GtkFileChooser widget.  Possible values are "gnome-vfs" and
+      "gtk+".</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/menus_have_icons</key>
+    <applyto>/desktop/poky/interface/menus_have_icons</applyto>
+    <type>bool</type>
+    <owner>settings-daemon</owner>
+    <default>false</default>
+    <locale name="C">
+      <short>Menus Have Icons</short>
+      <long>Whether menus may display an icon next to a menu entry</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/touchscreen</key>
+    <applyto>/desktop/poky/interface/touchscreen</applyto>
+    <type>bool</type>
+    <owner>settings-daemon</owner>
+    <default>true</default>
+    <locale name="C">
+      <short>GTK+ Touchscreen Mode</short>
+      <long>When TRUE, there are no motion notify events delivered on this screen,
+      and widgets can't use the pointer hovering them for any essential
+      functionality.</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/gtk-im-preedit-style</key>
+    <applyto>/desktop/poky/interface/gtk-im-preedit-style</applyto>
+    <owner>gnome</owner>
+    <type>string</type>
+    <default>callback</default>
+    <locale name="C">
+      <short>GTK IM Preedit Style</short>
+      <long>Name of the GTK+ input method Preedit Style used by gtk+.</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/gtk-im-status-style</key>
+    <applyto>/desktop/poky/interface/gtk-im-status-style</applyto>
+    <owner>gnome</owner>
+    <type>string</type>
+    <default>callback</default>
+    <locale name="C">
+      <short>GTK IM Status Style</short>
+      <long>Name of the GTK+ input method Status Style used by gtk+.</long>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/poky/interface/gtk-scrolled-window-placement</key>
+    <applyto>/desktop/poky/interface/gtk-scrolled-window-placement</applyto>
+    <owner>gnome</owner>
+    <type>string</type>
+    <default>GTK_CORNER_TOP_LEFT</default>
+    <locale name="C">
+      <short>Scrolled window content placement</short>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/gnome/sound/theme_name</key>
+    <applyto>/desktop/gnome/sound/theme_name</applyto>
+    <owner>gnome</owner>
+    <type>string</type>
+    <default>freedesktop</default>
+    <locale name="C">
+      <short>Sound Theme Name</short>
+    </locale>
+  </schema>
+
+  <schema>
+    <key>/schemas/desktop/gnome/sound/event_sounds</key>
+    <applyto>/desktop/gnome/sound/event_sounds</applyto>
+    <owner>gnome</owner>
+    <type>bool</type>
+    <default>true</default>
+    <locale name="C">
+      <short>Enable Sound Events</short>
+    </locale>
+  </schema>
+
+</schemalist>
+</gconfschemafile>
+

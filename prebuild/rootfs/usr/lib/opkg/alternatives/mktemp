@@ -1,0 +1,3 @@
+/bin/mktemp
+/bin/busybox 50
+/usr/bin/mktemp.coreutils 100

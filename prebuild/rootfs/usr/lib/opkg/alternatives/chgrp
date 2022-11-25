@@ -1,0 +1,3 @@
+/bin/chgrp
+/bin/busybox 50
+/bin/chgrp.coreutils 100

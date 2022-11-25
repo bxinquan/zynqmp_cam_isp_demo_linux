@@ -1,0 +1,3 @@
+/bin/pwd
+/bin/busybox 50
+/bin/pwd.coreutils 100

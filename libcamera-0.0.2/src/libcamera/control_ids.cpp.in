@@ -1,0 +1,62 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+/*
+ * Copyright (C) 2019, Google Inc.
+ *
+ * control_ids.cpp : Control ID list
+ *
+ * This file is auto-generated. Do not edit.
+ */
+
+#include <libcamera/control_ids.h>
+#include <libcamera/controls.h>
+
+/**
+ * \file control_ids.h
+ * \brief Camera control identifiers
+ */
+
+namespace libcamera {
+
+/**
+ * \brief Namespace for libcamera controls
+ */
+namespace controls {
+
+${controls_doc}
+
+/**
+ * \brief Namespace for libcamera draft controls
+ */
+namespace draft {
+
+${draft_controls_doc}
+
+} /* namespace draft */
+
+#ifndef __DOXYGEN__
+/*
+ * Keep the controls definitions hidden from doxygen as it incorrectly parses
+ * them as functions.
+ */
+${controls_def}
+
+namespace draft {
+
+${draft_controls_def}
+
+} /* namespace draft */
+#endif
+
+/**
+ * \brief List of all supported libcamera controls
+ *
+ * Unless otherwise stated, all controls are bi-directional, i.e. they can be
+ * set through Request::controls() and returned out through Request::metadata().
+ */
+extern const ControlIdMap controls {
+${controls_map}
+};
+
+} /* namespace controls */
+
+} /* namespace libcamera */

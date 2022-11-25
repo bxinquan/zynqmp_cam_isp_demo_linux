@@ -1,0 +1,55 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
+/*
+ * \todo Document the interface and remove the related EXCLUDE_PATTERNS entry.
+ */
+
+module ipa.vimc;
+
+import "include/libcamera/ipa/core.mojom";
+
+const string VimcIPAFIFOPath = "/tmp/libcamera_ipa_vimc_fifo";
+
+enum IPAOperationCode {
+	IPAOperationNone,
+	IPAOperationInit,
+	IPAOperationStart,
+	IPAOperationStop,
+};
+
+[scopedEnum] enum TestFlag {
+	Flag1 = 0x1,
+	Flag2 = 0x2,
+	Flag3 = 0x4,
+	Flag4 = 0x8,
+};
+
+interface IPAVimcInterface {
+	init(libcamera.IPASettings settings,
+	     IPAOperationCode code,
+	     [flags] TestFlag inFlags)
+	=> (int32 ret, [flags] TestFlag outFlags);
+
+	configure(libcamera.IPACameraSensorInfo sensorInfo,
+		  map<uint32, libcamera.IPAStream> streamConfig,
+		  map<uint32, libcamera.ControlInfoMap> entityControls) => (int32 ret);
+
+	start() => (int32 ret);
+	stop();
+
+	mapBuffers(array<libcamera.IPABuffer> buffers);
+	unmapBuffers(array<uint32> ids);
+
+	[async] queueRequest(uint32 frame, libcamera.ControlList controls);
+	/*
+	 * The vimc driver doesn't use parameters buffers. To maximize coverage
+	 * of unit tests that rely on the VIMC pipeline handler, we still define
+	 * interface functions that mimick how other pipeline handlers typically
+	 * handle parameters at runtime.
+	 */
+	[async] fillParamsBuffer(uint32 frame, uint32 bufferId);
+};
+
+interface IPAVimcEventInterface {
+	paramsBufferReady(uint32 bufferId, [flags] TestFlag flags);
+};

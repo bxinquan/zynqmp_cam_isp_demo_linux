@@ -1,0 +1,10 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libdrm_etnaviv
+Description: Userspace interface to Tegra kernel DRM services
+Version: 2.4.109
+Requires.private: libdrm
+Libs: -L${libdir} -ldrm_etnaviv
+Cflags: -I${includedir} -I${includedir}/libdrm

@@ -1,0 +1,3 @@
+/usr/bin/realpath
+/bin/busybox 50
+/usr/bin/realpath.coreutils 100

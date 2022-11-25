@@ -1,0 +1,3 @@
+/usr/bin/sort
+/bin/busybox 50
+/usr/bin/sort.coreutils 100

@@ -1,0 +1,13 @@
+[Unit]
+Description=IPv6 Packet Filtering Framework
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/ip6tables-restore -w -- /etc/iptables/ip6tables.rules
+ExecReload=/usr/sbin/ip6tables-restore -w -- /etc/iptables/ip6tables.rules
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,110 @@
+# Per-platform rpm configuration file.
+
+#==============================================================================
+# ---- per-platform macros.
+#
+%_arch			alpha
+%_build_arch		alpha
+%_vendor		pc
+%_os			linux
+%_gnu			-gnu
+%_target_platform	%{_target_cpu}-%{_vendor}-%{_target_os}
+%optflags		-O2 -g -mieee
+
+%__isa_name		alpha
+%__isa_bits		64
+%__isa			%{__isa_name}-%{__isa_bits}
+
+# The default transaction color. This value is a set of bits to
+# determine file and dependency affinity for this arch.
+#	0	uncolored (i.e. use only arch as install hint)
+#	1	Elf32 permitted
+#	2	Elf64 permitted
+%_transaction_color	0
+
+#==============================================================================
+# ---- configure macros.
+#
+%_prefix		/usr
+%_exec_prefix		/usr
+%_bindir		/usr/bin
+%_sbindir		/usr/sbin
+%_libexecdir		/usr/libexec
+%_datarootdir		%{_prefix}/share
+%_datadir		/usr/share
+%_sysconfdir		/etc
+%_sharedstatedir	/com
+%_localstatedir		/var
+%_lib			lib
+%_libdir		/usr/lib
+%_includedir		/usr/include
+%_oldincludedir		/usr/include
+%_infodir		/usr/share/info
+%_mandir		/usr/share/man
+%_initddir		%{_sysconfdir}/rc.d/init.d
+# Deprecated misspelling, present for backwards compatibility.
+%_initrddir		%{_initddir}
+%_rundir		/run
+
+%_defaultdocdir		%{_datadir}/doc
+
+# Maximum number of CPU's to use when building, 0 for unlimited.
+#%_smp_ncpus_max 0
+
+%_smp_build_ncpus %([ -z "$RPM_BUILD_NCPUS" ] \\\
+	&& RPM_BUILD_NCPUS="%{getncpus}"; \\\
+        ncpus_max=%{?_smp_ncpus_max}; \\\
+        if [ -n "$ncpus_max" ] && [ "$ncpus_max" -gt 0 ] && [ "$RPM_BUILD_NCPUS" -gt "$ncpus_max" ]; then RPM_BUILD_NCPUS="$ncpus_max"; fi; \\\
+        echo "$RPM_BUILD_NCPUS";)
+
+%_smp_mflags -j%{_smp_build_ncpus}
+
+# Maximum number of threads to use when building, 0 for unlimited
+#%_smp_nthreads_max 0
+
+%_smp_build_nthreads %{_smp_build_ncpus}
+
+#==============================================================================
+# ---- Build policy macros.
+#
+#---------------------------------------------------------------------
+#	Expanded at beginning of %install scriptlet.
+#
+
+%__spec_install_pre %{___build_pre}\
+    %{__rm} -rf "%{buildroot}"\
+    %{__mkdir_p} "%{dirname:%{buildroot}}"\
+    %{__mkdir} "%{buildroot}"\
+%{nil}
+
+#---------------------------------------------------------------------
+#	Expanded at end of %install scriptlet.
+#
+
+%__arch_install_post   %{nil}
+%_python_bytecompile_errors_terminate_build 0
+%_python_bytecompile_extra   1
+
+# Standard brp-macro naming:
+# convert all '-' in basename to '_', add two leading underscores.
+%__brp_compress %{_rpmconfigdir}/brp-compress %{?_prefix}
+%__brp_java_gcjcompile %{_rpmconfigdir}/brp-java-bytecompile
+%__brp_python_bytecompile %{_rpmconfigdir}/brp-python-bytecompile "" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}"
+%__brp_strip %{_rpmconfigdir}/brp-strip %{__strip}
+%__brp_strip_comment_note %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump}
+%__brp_strip_shared %{_rpmconfigdir}/brp-strip-shared
+%__brp_strip_static_archive %{_rpmconfigdir}/brp-strip-static-archive %{__strip}
+
+%__os_install_post    \
+    %{?__brp_compress} \
+    %{?__brp_strip} \
+    %{?__brp_strip_static_archive} \
+    %{?__brp_strip_comment_note} \
+%{nil}
+
+%__spec_install_post\
+    %{?__debug_package:%{__debug_install_post}}\
+    %{__arch_install_post}\
+    %{__os_install_post}\
+%{nil}
+

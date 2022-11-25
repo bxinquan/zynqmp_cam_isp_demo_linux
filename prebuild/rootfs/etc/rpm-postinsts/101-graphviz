@@ -1,0 +1,12 @@
+# graphviz - postinst
+#!/bin/sh
+set -e
+if [ x"$D" = "x" ]; then
+	if [ -x /sbin/ldconfig ]; then /sbin/ldconfig ; fi
+fi
+
+if [ -n "$D" ]; then
+    $INTERCEPT_DIR/postinst_intercept delay_to_first_boot graphviz mlprefix=
+    exit 0
+fi
+  /usr/bin/dot -c

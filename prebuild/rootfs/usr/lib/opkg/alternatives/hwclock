@@ -1,0 +1,3 @@
+/sbin/hwclock
+/bin/busybox 50
+/sbin/hwclock.util-linux 80

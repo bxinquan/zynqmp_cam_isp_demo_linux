@@ -1,0 +1,3 @@
+/sbin/pivot_root
+/bin/busybox 50
+/sbin/pivot_root.util-linux 80

@@ -1,0 +1,15 @@
+prefix=/usr
+exec_prefix=/usr
+includedir=/usr/include
+libdir=/usr/lib
+host=aarch64-xilinx-linux-gnu
+mtcflags=
+mtlibs=-lpthread
+
+Name: gpg-error
+Description: GPG Runtime
+Version: 1.42-unknown
+Cflags: 
+Libs: -lgpg-error
+Libs.private: 
+URL: https://www.gnupg.org/software/libgpg-error/index.html

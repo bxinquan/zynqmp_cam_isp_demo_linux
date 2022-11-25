@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+
+Name: XCB XKB
+Description: XCB Keyboard Extension (EXPERIMENTAL)
+Version: 1.14
+Requires.private: xcb
+Libs: -L${libdir} -lxcb-xkb
+Cflags: -I${includedir}

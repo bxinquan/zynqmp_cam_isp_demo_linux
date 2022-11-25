@@ -1,0 +1,7 @@
+notebook<7
+jupyter_server~=1.8
+
+[test]
+pytest
+pytest-tornasync
+pytest-console-scripts

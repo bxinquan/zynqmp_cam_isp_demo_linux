@@ -1,0 +1,3 @@
+/bin/cat
+/bin/busybox 50
+/bin/cat.coreutils 100

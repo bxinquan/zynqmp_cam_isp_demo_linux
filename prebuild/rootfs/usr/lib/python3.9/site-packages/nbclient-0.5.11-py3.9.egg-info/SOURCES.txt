@@ -1,0 +1,69 @@
+.pre-commit-config.yaml
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+MANIFEST.in
+README.md
+RELEASING.md
+pyproject.toml
+requirements-dev.txt
+requirements.txt
+setup.cfg
+setup.py
+docs/Makefile
+docs/UPDATE.md
+docs/client.rst
+docs/conf.py
+docs/index.rst
+docs/installation.rst
+docs/make.bat
+docs/requirements-doc.txt
+docs/_static/custom.css
+docs/reference/index.rst
+docs/reference/modules.rst
+docs/reference/nbclient.rst
+docs/reference/nbclient.tests.rst
+nbclient/__init__.py
+nbclient/_version.py
+nbclient/cli.py
+nbclient/client.py
+nbclient/exceptions.py
+nbclient/jsonutil.py
+nbclient/output_widget.py
+nbclient/util.py
+nbclient.egg-info/PKG-INFO
+nbclient.egg-info/SOURCES.txt
+nbclient.egg-info/dependency_links.txt
+nbclient.egg-info/entry_points.txt
+nbclient.egg-info/requires.txt
+nbclient.egg-info/top_level.txt
+nbclient/tests/__init__.py
+nbclient/tests/base.py
+nbclient/tests/conftest.py
+nbclient/tests/fake_kernelmanager.py
+nbclient/tests/test_client.py
+nbclient/tests/test_util.py
+nbclient/tests/files/Autokill.ipynb
+nbclient/tests/files/Check History in Memory.ipynb
+nbclient/tests/files/Clear Output.ipynb
+nbclient/tests/files/Disable Stdin.ipynb
+nbclient/tests/files/Empty Cell.ipynb
+nbclient/tests/files/Error.ipynb
+nbclient/tests/files/Factorials.ipynb
+nbclient/tests/files/HelloWorld.ipynb
+nbclient/tests/files/Inline Image.ipynb
+nbclient/tests/files/Interrupt.ipynb
+nbclient/tests/files/JupyterWidgets.ipynb
+nbclient/tests/files/Other Comms.ipynb
+nbclient/tests/files/Output.ipynb
+nbclient/tests/files/Parallel Execute A.ipynb
+nbclient/tests/files/Parallel Execute B.ipynb
+nbclient/tests/files/SVG.ipynb
+nbclient/tests/files/Skip Exceptions with Cell Tags.ipynb
+nbclient/tests/files/Skip Exceptions.ipynb
+nbclient/tests/files/Skip Execution with Cell Tag.ipynb
+nbclient/tests/files/Sleep1s.ipynb
+nbclient/tests/files/Unicode.ipynb
+nbclient/tests/files/UnicodePy3.ipynb
+nbclient/tests/files/python.png
+nbclient/tests/files/update-display-id.ipynb

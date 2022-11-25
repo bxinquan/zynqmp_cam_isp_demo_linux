@@ -1,0 +1,18 @@
+[Unit]
+Description=Bind mount volatile /var/lib
+DefaultDependencies=false
+Before=local-fs.target systemd-random-seed.service
+RequiresMountsFor=/var/volatile /var
+ConditionPathIsReadWrite=/var/volatile
+ConditionPathExists=/var/lib
+ConditionPathIsReadWrite=!/var/lib
+
+[Service]
+Type=oneshot
+RemainAfterExit=Yes
+TimeoutSec=0
+ExecStart=/sbin/mount-copybind /var/volatile/lib /var/lib
+ExecStop=/bin/umount /var/lib
+
+[Install]
+WantedBy=local-fs.target systemd-random-seed.service

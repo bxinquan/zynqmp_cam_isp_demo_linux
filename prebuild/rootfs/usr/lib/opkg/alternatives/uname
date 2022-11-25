@@ -1,0 +1,3 @@
+/bin/uname
+/bin/busybox 50
+/bin/uname.coreutils 100
