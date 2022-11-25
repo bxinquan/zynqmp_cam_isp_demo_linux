@@ -1,0 +1,16 @@
+#libevent pkg-config source file
+
+prefix=/home/bxinquan/libevent-2.1.12-stable/install_arm64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libevent_core
+Description: libevent_core
+Version: 2.1.12-stable
+Requires:
+Conflicts:
+Libs: -L${libdir} -levent_core
+Libs.private: 
+Cflags: -I${includedir}
+

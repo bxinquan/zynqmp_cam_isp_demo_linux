@@ -1,0 +1,9 @@
+prefix=/home/bxinquan/libcamera-0.0.2/install_arm64
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libcamera-base
+Description: Camera support base utility library
+Version: 0.0.2
+Libs: -L${libdir} -lcamera-base
+Cflags: -I${includedir}/libcamera
