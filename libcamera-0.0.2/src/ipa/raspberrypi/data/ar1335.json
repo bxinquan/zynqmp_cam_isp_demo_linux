@@ -209,7 +209,8 @@
                     1000, 0.165,
                     10000, 0.17
                 ],
-                "base_ev": 1.25
+                "base_ev": 1.25,
+                "fast_reduce_threshold": 0.6
             }
         },
         {
