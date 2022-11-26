@@ -213,7 +213,10 @@ std::vector<Size> StreamFormats::sizes(const PixelFormat &pixelformat) const
 	if (!discrete) {
 		if (ranges.size() != 1) {
 			LOG(Stream, Error) << "Range format is ambiguous";
-			return {};
+			for (auto aa : ranges) {
+				LOG(Stream, Info) << aa;
+			}
+			//return {}; //FIXME
 		}
 
 		const SizeRange &limit = ranges.front();

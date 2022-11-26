@@ -1004,6 +1004,16 @@ config VIDEO_OV5647
 	  To compile this driver as a module, choose M here: the
 	  module will be called ov5647.
 
+config VIDEO_AR1335
+	tristate "Aptina AR1335 sensor support"
+	depends on I2C && VIDEO_V4L2
+	select MEDIA_CONTROLLER
+	select VIDEO_V4L2_SUBDEV_API
+	select V4L2_FWNODE
+	help
+	  This is a Video4Linux2 sensor driver for the Aptina
+	  AR1335 camera.
+
 config VIDEO_OV5648
 	tristate "OmniVision OV5648 sensor support"
 	depends on I2C && PM && VIDEO_V4L2

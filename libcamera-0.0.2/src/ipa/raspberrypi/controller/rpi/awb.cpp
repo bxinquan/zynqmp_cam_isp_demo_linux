@@ -21,8 +21,8 @@ LOG_DEFINE_CATEGORY(RPiAwb)
 
 #define NAME "rpi.awb"
 
-static constexpr unsigned int AwbStatsSizeX = DEFAULT_AWB_REGIONS_X;
-static constexpr unsigned int AwbStatsSizeY = DEFAULT_AWB_REGIONS_Y;
+static constexpr unsigned int AwbStatsSizeX = 1;
+static constexpr unsigned int AwbStatsSizeY = 1;
 
 /*
  * todo - the locking in this algorithm needs some tidying up as has been done
@@ -142,7 +142,7 @@ int AwbConfig::read(const libcamera::YamlObject &params)
 
 	minPixels = params["min_pixels"].get<double>(16.0);
 	minG = params["min_G"].get<uint16_t>(32);
-	minRegions = params["min_regions"].get<uint32_t>(10);
+	minRegions = params["min_regions"].get<uint32_t>(0);
 	deltaLimit = params["delta_limit"].get<double>(0.2);
 	coarseStep = params["coarse_step"].get<double>(0.2);
 	transversePos = params["transverse_pos"].get<double>(0.01);
@@ -406,21 +406,19 @@ void Awb::asyncFunc()
 }
 
 static void generateStats(std::vector<Awb::RGB> &zones,
-			  bcm2835_isp_stats_region *stats, double minPixels,
+			  xil_isp_lite_stat_awb_result *stats, double minPixels,
 			  double minG)
 {
-	for (unsigned int i = 0; i < AwbStatsSizeX * AwbStatsSizeY; i++) {
 		Awb::RGB zone;
-		double counted = stats[i].counted;
+		double counted = stats->pix_cnt;
 		if (counted >= minPixels) {
-			zone.G = stats[i].g_sum / counted;
+			zone.G = stats->sum_g / counted;
 			if (zone.G >= minG) {
-				zone.R = stats[i].r_sum / counted;
-				zone.B = stats[i].b_sum / counted;
+				zone.R = stats->sum_r / counted;
+				zone.B = stats->sum_b / counted;
 				zones.push_back(zone);
 			}
 		}
-	}
 }
 
 void Awb::prepareStats()
@@ -430,7 +428,7 @@ void Awb::prepareStats()
 	 * LSC has already been applied to the stats in this pipeline, so stop
 	 * any LSC compensation.  We also ignore config_.fast in this version.
 	 */
-	generateStats(zones_, statistics_->awb_stats, config_.minPixels,
+	generateStats(zones_, &statistics_->awb, config_.minPixels,
 		      config_.minG);
 	/*
 	 * we're done with these; we may as well relinquish our hold on the

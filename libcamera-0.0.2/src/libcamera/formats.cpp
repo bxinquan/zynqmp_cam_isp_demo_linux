@@ -622,7 +622,7 @@ const std::map<PixelFormat, PixelFormatInfo> pixelFormatInfo{
 	{ formats::SGRBG10_CSI2P, {
 		.name = "SGRBG10_CSI2P",
 		.format = formats::SGRBG10_CSI2P,
-		.v4l2Formats = { V4L2PixelFormat(V4L2_PIX_FMT_SGRBG10P), },
+		.v4l2Formats = { V4L2PixelFormat(V4L2_PIX_FMT_XY10), },
 		.bitsPerPixel = 10,
 		.colourEncoding = PixelFormatInfo::ColourEncodingRAW,
 		.packed = true,

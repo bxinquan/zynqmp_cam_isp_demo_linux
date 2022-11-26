@@ -23,4 +23,4 @@ endif
 
 apps_lib = static_library('apps', apps_sources,
                           cpp_args : apps_cpp_args,
-                          dependencies : [libcamera_public])
+                          dependencies : [libcamera_public, libevent])

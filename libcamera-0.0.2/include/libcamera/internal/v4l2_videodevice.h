@@ -117,7 +117,8 @@ struct V4L2Capability final : v4l2_capability {
 	}
 	bool hasMediaController() const
 	{
-		return device_caps() & V4L2_CAP_IO_MC;
+		return device_caps();
+		//return device_caps() & V4L2_CAP_IO_MC;
 	}
 };
 

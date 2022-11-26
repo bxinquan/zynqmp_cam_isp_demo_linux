@@ -98,7 +98,7 @@ private:
 	void housekeepConfig();
 	void fetchCurrentExposure(Metadata *imageMetadata);
 	void fetchAwbStatus(Metadata *imageMetadata);
-	void computeGain(bcm2835_isp_stats *statistics, Metadata *imageMetadata,
+	void computeGain(xil_isp_lite_stat_result *statistics, Metadata *imageMetadata,
 			 double &gain, double &targetY);
 	void computeTargetExposure(double gain);
 	bool applyDigitalGain(double gain, double targetY);

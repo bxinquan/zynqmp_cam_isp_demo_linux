@@ -14,7 +14,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include <linux/bcm2835-isp.h>
+#include <linux/xil-isp-lite.h>
 
 #include <libcamera/base/log.h>
 #include <libcamera/base/shared_fd.h>
@@ -625,18 +625,20 @@ bool IPARPi::validateSensorControls()
 bool IPARPi::validateIspControls()
 {
 	static const uint32_t ctrls[] = {
-		V4L2_CID_RED_BALANCE,
-		V4L2_CID_BLUE_BALANCE,
-		V4L2_CID_DIGITAL_GAIN,
-		V4L2_CID_USER_BCM2835_ISP_CC_MATRIX,
-		V4L2_CID_USER_BCM2835_ISP_GAMMA,
-		V4L2_CID_USER_BCM2835_ISP_BLACK_LEVEL,
-		V4L2_CID_USER_BCM2835_ISP_GEQ,
-		V4L2_CID_USER_BCM2835_ISP_DENOISE,
-		V4L2_CID_USER_BCM2835_ISP_SHARPEN,
-		V4L2_CID_USER_BCM2835_ISP_DPC,
-		V4L2_CID_USER_BCM2835_ISP_LENS_SHADING,
-		V4L2_CID_USER_BCM2835_ISP_CDN,
+		V4L2_CID_USER_XIL_ISP_LITE_TOP,
+		V4L2_CID_USER_XIL_ISP_LITE_DPC,
+		V4L2_CID_USER_XIL_ISP_LITE_BLC,
+		V4L2_CID_USER_XIL_ISP_LITE_BNR,
+		V4L2_CID_USER_XIL_ISP_LITE_DGAIN,
+		V4L2_CID_USER_XIL_ISP_LITE_DEMOSAIC,
+		V4L2_CID_USER_XIL_ISP_LITE_WB,
+		V4L2_CID_USER_XIL_ISP_LITE_CCM,
+		V4L2_CID_USER_XIL_ISP_LITE_CSC,
+		V4L2_CID_USER_XIL_ISP_LITE_GAMMA,
+		V4L2_CID_USER_XIL_ISP_LITE_2DNR,
+		V4L2_CID_USER_XIL_ISP_LITE_EE,
+		V4L2_CID_USER_XIL_ISP_LITE_STAT_AE_CFG,
+		V4L2_CID_USER_XIL_ISP_LITE_STAT_AWB_CFG,
 	};
 
 	for (auto c : ctrls) {
@@ -1064,9 +1066,10 @@ void IPARPi::prepareISP(const ISPConfig &data)
 	if (ccmStatus)
 		applyCCM(ccmStatus, ctrls);
 
-	AgcStatus *dgStatus = rpiMetadata_.getLocked<AgcStatus>("agc.status");
-	if (dgStatus)
-		applyDG(dgStatus, ctrls);
+	//FIXME
+	//AgcStatus *dgStatus = rpiMetadata_.getLocked<AgcStatus>("agc.status");
+	//if (dgStatus)
+	//	applyDG(dgStatus, ctrls);
 
 	AlscStatus *lsStatus = rpiMetadata_.getLocked<AlscStatus>("alsc.status");
 	if (lsStatus)
@@ -1128,8 +1131,8 @@ void IPARPi::processStats(unsigned int bufferId)
 	}
 
 	Span<uint8_t> mem = it->second.planes()[0];
-	bcm2835_isp_stats *stats = reinterpret_cast<bcm2835_isp_stats *>(mem.data());
-	RPiController::StatisticsPtr statistics = std::make_shared<bcm2835_isp_stats>(*stats);
+	xil_isp_lite_stat_result *stats = reinterpret_cast<xil_isp_lite_stat_result *>(mem.data());
+	RPiController::StatisticsPtr statistics = std::make_shared<xil_isp_lite_stat_result>(*stats);
 	helper_->process(statistics, rpiMetadata_);
 	controller_.process(statistics, &rpiMetadata_);
 
@@ -1147,10 +1150,14 @@ void IPARPi::applyAWB(const struct AwbStatus *awbStatus, ControlList &ctrls)
 	LOG(IPARPI, Debug) << "Applying WB R: " << awbStatus->gainR << " B: "
 			   << awbStatus->gainB;
 
-	ctrls.set(V4L2_CID_RED_BALANCE,
-		  static_cast<int32_t>(awbStatus->gainR * 1000));
-	ctrls.set(V4L2_CID_BLUE_BALANCE,
-		  static_cast<int32_t>(awbStatus->gainB * 1000));
+	xil_isp_lite_wb wb;
+	wb.enabled = 1;
+	wb.ggain = 1 * 16;
+	wb.rgain = awbStatus->gainR * 16;
+	wb.bgain = awbStatus->gainB * 16;
+	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&wb),
+					    sizeof(wb) });
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_WB, c);
 }
 
 void IPARPi::applyFrameDurations(Duration minFrameDuration, Duration maxFrameDuration)
@@ -1231,192 +1238,112 @@ void IPARPi::applyAGC(const struct AgcStatus *agcStatus, ControlList &ctrls)
 
 void IPARPi::applyDG(const struct AgcStatus *dgStatus, ControlList &ctrls)
 {
-	ctrls.set(V4L2_CID_DIGITAL_GAIN,
-		  static_cast<int32_t>(dgStatus->digitalGain * 1000));
+	xil_isp_lite_dgain dgain;
+
+	dgain.enabled = 1;
+	dgain.gain = dgStatus->digitalGain * 16;
+	dgain.offset = 0;
+
+	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&dgain),
+					    sizeof(dgain) });
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_DGAIN, c);
 }
 
 void IPARPi::applyCCM(const struct CcmStatus *ccmStatus, ControlList &ctrls)
 {
-	bcm2835_isp_custom_ccm ccm;
+	xil_isp_lite_ccm ccm;
 
 	for (int i = 0; i < 9; i++) {
-		ccm.ccm.ccm[i / 3][i % 3].den = 1000;
-		ccm.ccm.ccm[i / 3][i % 3].num = 1000 * ccmStatus->matrix[i];
+		ccm.matrix[i] = ccmStatus->matrix[i] * 16;
 	}
 
 	ccm.enabled = 1;
-	ccm.ccm.offsets[0] = ccm.ccm.offsets[1] = ccm.ccm.offsets[2] = 0;
 
 	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&ccm),
 					    sizeof(ccm) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_CC_MATRIX, c);
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_CCM, c);
 }
 
-void IPARPi::applyGamma(const struct ContrastStatus *contrastStatus, ControlList &ctrls)
+void IPARPi::applyGamma([[maybe_unused]] const struct ContrastStatus *contrastStatus, [[maybe_unused]] ControlList &ctrls)
 {
-	struct bcm2835_isp_gamma gamma;
+	//struct xil_isp_lite_gamma gamma;
 
-	gamma.enabled = 1;
-	for (unsigned int i = 0; i < ContrastNumPoints; i++) {
-		gamma.x[i] = contrastStatus->points[i].x;
-		gamma.y[i] = contrastStatus->points[i].y;
-	}
+	//gamma.enabled = 1;
+	//for (unsigned int i = 0; i < ContrastNumPoints; i++) {
+	//	//TODO
+	//}
 
-	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&gamma),
-					    sizeof(gamma) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_GAMMA, c);
+	//ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&gamma),
+	//				    sizeof(gamma) });
+	//ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_GAMMA, c);
 }
 
 void IPARPi::applyBlackLevel(const struct BlackLevelStatus *blackLevelStatus, ControlList &ctrls)
 {
-	bcm2835_isp_black_level blackLevel;
+	xil_isp_lite_blc blackLevel;
 
 	blackLevel.enabled = 1;
-	blackLevel.black_level_r = blackLevelStatus->blackLevelR;
-	blackLevel.black_level_g = blackLevelStatus->blackLevelG;
-	blackLevel.black_level_b = blackLevelStatus->blackLevelB;
+	blackLevel.black_level_r  = blackLevelStatus->blackLevelR;
+	blackLevel.black_level_gr = blackLevelStatus->blackLevelG;
+	blackLevel.black_level_gb = blackLevelStatus->blackLevelG;
+	blackLevel.black_level_b  = blackLevelStatus->blackLevelB;
 
 	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&blackLevel),
 					    sizeof(blackLevel) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_BLACK_LEVEL, c);
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_BLC, c);
 }
 
-void IPARPi::applyGEQ(const struct GeqStatus *geqStatus, ControlList &ctrls)
+void IPARPi::applyGEQ([[maybe_unused]] const struct GeqStatus *geqStatus, [[maybe_unused]] ControlList &ctrls)
 {
-	bcm2835_isp_geq geq;
-
-	geq.enabled = 1;
-	geq.offset = geqStatus->offset;
-	geq.slope.den = 1000;
-	geq.slope.num = 1000 * geqStatus->slope;
-
-	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&geq),
-					    sizeof(geq) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_GEQ, c);
 }
 
-void IPARPi::applyDenoise(const struct DenoiseStatus *denoiseStatus, ControlList &ctrls)
+void IPARPi::applyDenoise([[maybe_unused]] const struct DenoiseStatus *denoiseStatus, [[maybe_unused]] ControlList &ctrls)
 {
 	using RPiController::DenoiseMode;
 
-	bcm2835_isp_denoise denoise;
+	xil_isp_lite_bnr bnr;
 	DenoiseMode mode = static_cast<DenoiseMode>(denoiseStatus->mode);
 
-	denoise.enabled = mode != DenoiseMode::Off;
-	denoise.constant = denoiseStatus->noiseConstant;
-	denoise.slope.num = 1000 * denoiseStatus->noiseSlope;
-	denoise.slope.den = 1000;
-	denoise.strength.num = 1000 * denoiseStatus->strength;
-	denoise.strength.den = 1000;
+	bnr.enabled = mode != DenoiseMode::Off;
+	bnr.nr_level = denoiseStatus->strength * 4;
 
-	/* Set the CDN mode to match the SDN operating mode. */
-	bcm2835_isp_cdn cdn;
-	switch (mode) {
-	case DenoiseMode::ColourFast:
-		cdn.enabled = 1;
-		cdn.mode = CDN_MODE_FAST;
-		break;
-	case DenoiseMode::ColourHighQuality:
-		cdn.enabled = 1;
-		cdn.mode = CDN_MODE_HIGH_QUALITY;
-		break;
-	default:
-		cdn.enabled = 0;
-	}
-
-	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&denoise),
-					    sizeof(denoise) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_DENOISE, c);
-
-	c = ControlValue(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&cdn),
-					      sizeof(cdn) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_CDN, c);
+	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&bnr),
+					    sizeof(bnr) });
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_BNR, c);
 }
 
-void IPARPi::applySharpen(const struct SharpenStatus *sharpenStatus, ControlList &ctrls)
+void IPARPi::applySharpen([[maybe_unused]] const struct SharpenStatus *sharpenStatus, [[maybe_unused]] ControlList &ctrls)
 {
-	bcm2835_isp_sharpen sharpen;
+	xil_isp_lite_ee ee;
+	ee.enabled = sharpenStatus->strength >= 0.5;
 
-	sharpen.enabled = 1;
-	sharpen.threshold.num = 1000 * sharpenStatus->threshold;
-	sharpen.threshold.den = 1000;
-	sharpen.strength.num = 1000 * sharpenStatus->strength;
-	sharpen.strength.den = 1000;
-	sharpen.limit.num = 1000 * sharpenStatus->limit;
-	sharpen.limit.den = 1000;
-
-	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&sharpen),
-					    sizeof(sharpen) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_SHARPEN, c);
+	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&ee),
+					    sizeof(ee) });
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_EE, c);
 }
 
 void IPARPi::applyDPC(const struct DpcStatus *dpcStatus, ControlList &ctrls)
 {
-	bcm2835_isp_dpc dpc;
+	xil_isp_lite_dpc dpc;
 
-	dpc.enabled = 1;
-	dpc.strength = dpcStatus->strength;
+	if (dpcStatus->strength == 0) {
+		dpc.enabled = 0;
+		dpc.threshold = 0;
+	} else if (dpcStatus->strength == 1) {
+		dpc.enabled = 0;
+		dpc.threshold = 32 << 2;
+	} else {
+		dpc.enabled = 0;
+		dpc.threshold = 8 << 2;
+	}
 
 	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&dpc),
 					    sizeof(dpc) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_DPC, c);
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_DPC, c);
 }
 
-void IPARPi::applyLS(const struct AlscStatus *lsStatus, ControlList &ctrls)
+void IPARPi::applyLS([[maybe_unused]] const struct AlscStatus *lsStatus, [[maybe_unused]] ControlList &ctrls)
 {
-	/*
-	 * Program lens shading tables into pipeline.
-	 * Choose smallest cell size that won't exceed 63x48 cells.
-	 */
-	const int cellSizes[] = { 16, 32, 64, 128, 256 };
-	unsigned int numCells = std::size(cellSizes);
-	unsigned int i, w, h, cellSize;
-	for (i = 0; i < numCells; i++) {
-		cellSize = cellSizes[i];
-		w = (mode_.width + cellSize - 1) / cellSize;
-		h = (mode_.height + cellSize - 1) / cellSize;
-		if (w < 64 && h <= 48)
-			break;
-	}
-
-	if (i == numCells) {
-		LOG(IPARPI, Error) << "Cannot find cell size";
-		return;
-	}
-
-	/* We're going to supply corner sampled tables, 16 bit samples. */
-	w++, h++;
-	bcm2835_isp_lens_shading ls = {
-		.enabled = 1,
-		.grid_cell_size = cellSize,
-		.grid_width = w,
-		.grid_stride = w,
-		.grid_height = h,
-		/* .dmabuf will be filled in by pipeline handler. */
-		.dmabuf = 0,
-		.ref_transform = 0,
-		.corner_sampled = 1,
-		.gain_format = GAIN_FORMAT_U4P10
-	};
-
-	if (!lsTable_ || w * h * 4 * sizeof(uint16_t) > MaxLsGridSize) {
-		LOG(IPARPI, Error) << "Do not have a correctly allocate lens shading table!";
-		return;
-	}
-
-	if (lsStatus) {
-		/* Format will be u4.10 */
-		uint16_t *grid = static_cast<uint16_t *>(lsTable_);
-
-		resampleTable(grid, lsStatus->r, w, h);
-		resampleTable(grid + w * h, lsStatus->g, w, h);
-		std::memcpy(grid + 2 * w * h, grid + w * h, w * h * sizeof(uint16_t));
-		resampleTable(grid + 3 * w * h, lsStatus->b, w, h);
-	}
-
-	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&ls),
-					    sizeof(ls) });
-	ctrls.set(V4L2_CID_USER_BCM2835_ISP_LENS_SHADING, c);
 }
 
 /*

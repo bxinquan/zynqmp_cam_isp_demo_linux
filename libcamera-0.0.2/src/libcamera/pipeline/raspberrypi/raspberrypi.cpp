@@ -26,7 +26,7 @@
 #include <libcamera/property_ids.h>
 #include <libcamera/request.h>
 
-#include <linux/bcm2835-isp.h>
+#include <linux/xil-isp-lite.h>
 #include <linux/media-bus-format.h>
 #include <linux/videodev2.h>
 
@@ -108,6 +108,11 @@ V4L2DeviceFormat toV4L2DeviceFormat(const V4L2VideoDevice *dev,
 	deviceFormat.fourcc = dev->toV4L2PixelFormat(pix);
 	deviceFormat.size = format.size;
 	deviceFormat.colorSpace = format.colorSpace;
+	if (deviceFormat.fourcc == V4L2_PIX_FMT_XY10) { //by bxq
+		deviceFormat.planesCount = 1;
+		deviceFormat.planes[0].bpl = (((deviceFormat.size.width + 2) / 3 * 4) + 255) / 256 * 256;
+		deviceFormat.planes[0].size = deviceFormat.planes[0].bpl * deviceFormat.size.height;
+	}
 	return deviceFormat;
 }
 
@@ -175,7 +180,7 @@ V4L2SubdeviceFormat findBestFormat(const SensorFormats &formatsMap, const Size &
 }
 
 enum class Unicam : unsigned int { Image, Embedded };
-enum class Isp : unsigned int { Input, Output0, Output1, Stats };
+enum class Isp : unsigned int { Input, Output0, Stats };
 
 } /* namespace */
 
@@ -227,8 +232,9 @@ public:
 	std::unique_ptr<CameraSensor> sensor_;
 	SensorFormats sensorFormats_;
 	/* Array of Unicam and ISP device streams and associated buffers/streams. */
+	std::unique_ptr<V4L2Subdevice> mipirx_;
 	RPi::Device<Unicam, 2> unicam_;
-	RPi::Device<Isp, 4> isp_;
+	RPi::Device<Isp, 3> isp_;
 	/* The vector below is just for convenience when iterating over all streams. */
 	std::vector<RPi::Stream *> streams_;
 	/* Stores the ids of the buffers mapped in the IPA. */
@@ -420,7 +426,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 	 */
 	combinedTransform_ = combined;
 
-	unsigned int rawCount = 0, outCount = 0, count = 0, maxIndex = 0;
+	unsigned int rawCount = 0, outCount = 0, count = 0;
 	std::pair<int, Size> outSize[2];
 	Size maxSize;
 	for (StreamConfiguration &cfg : config_) {
@@ -474,7 +480,6 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 			/* Record the largest resolution for fixups later. */
 			if (maxSize < cfg.size) {
 				maxSize = cfg.size;
-				maxIndex = outCount;
 			}
 			outCount++;
 		}
@@ -516,10 +521,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 		PixelFormat &cfgPixFmt = cfg.pixelFormat;
 		V4L2VideoDevice *dev;
 
-		if (i == maxIndex)
 			dev = data_->isp_[Isp::Output0].dev();
-		else
-			dev = data_->isp_[Isp::Output1].dev();
 
 		V4L2VideoDevice::Formats fmts = dev->formats();
 
@@ -621,13 +623,13 @@ PipelineHandlerRPi::generateConfiguration(Camera *camera, const StreamRoles &rol
 			 * algorithm.
 			 */
 			fmts = data->isp_[Isp::Output0].dev()->formats();
-			pixelFormat = formats::YUV420;
+			pixelFormat = formats::RGB888;
 			/*
 			 * Choose a color space appropriate for video recording.
 			 * Rec.709 will be a good default for HD resolutions.
 			 */
 			colorSpace = ColorSpace::Rec709;
-			size = { 1920, 1080 };
+			size = { 2048, 1536 };
 			bufferCount = 4;
 			outCount++;
 			break;
@@ -705,7 +707,6 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 
 	BayerFormat::Packing packing = BayerFormat::Packing::CSI2;
 	Size maxSize, sensorSize;
-	unsigned int maxIndex = 0;
 	bool rawStream = false;
 	unsigned int bitDepth = defaultRawBitDepth;
 
@@ -730,7 +731,6 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		} else {
 			if (cfg.size > maxSize) {
 				maxSize = config->at(i).size;
-				maxIndex = i;
 			}
 		}
 	}
@@ -750,6 +750,15 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 			     static_cast<int32_t>(!!(rpiConfig->combinedTransform_ & Transform::VFlip)));
 		data->setSensorControls(controls);
 	}
+
+	//XXX not change sensor output size
+	IPACameraSensorInfo sensorInfo;
+	ret = data->sensor_->sensorInfo(&sensorInfo);
+	if (ret) {
+		LOG(RPI, Error) << "Failed to retrieve camera sensor info";
+		return ret;
+	}
+	maxSize = sensorInfo.outputSize;
 
 	/* First calculate the best sensor mode we can use based on the user request. */
 	V4L2SubdeviceFormat sensorFormat = findBestFormat(data->sensorFormats_, rawStream ? sensorSize : maxSize, bitDepth);
@@ -776,7 +785,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 	 * StreamConfiguration appropriately.
 	 */
 	V4L2DeviceFormat format;
-	bool output0Set = false, output1Set = false;
+	bool output0Set = false;
 	for (unsigned i = 0; i < config->size(); i++) {
 		StreamConfiguration &cfg = config->at(i);
 
@@ -787,13 +796,27 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		}
 
 		/* The largest resolution gets routed to the ISP Output 0 node. */
-		RPi::Stream *stream = i == maxIndex ? &data->isp_[Isp::Output0]
-						    : &data->isp_[Isp::Output1];
+		RPi::Stream *stream = &data->isp_[Isp::Output0];
 
 		V4L2PixelFormat fourcc = stream->dev()->toV4L2PixelFormat(cfg.pixelFormat);
 		format.size = cfg.size;
 		format.fourcc = fourcc;
 		format.colorSpace = cfg.colorSpace;
+		if (fourcc == V4L2_PIX_FMT_RGB24) {
+			format.planesCount = 1;
+			format.planes[0].bpl  = cfg.size.width * 3;
+			format.planes[0].size = cfg.size.width * 3 * cfg.size.height;
+		} else if (fourcc == V4L2_PIX_FMT_NV12) {
+			format.planesCount = 2;
+			format.planes[0].bpl  = cfg.size.width;
+			format.planes[0].size = cfg.size.width * cfg.size.height;
+			format.planes[1].bpl  = cfg.size.width;
+			format.planes[1].size = cfg.size.width * cfg.size.height / 2;
+		} else if (fourcc == V4L2_PIX_FMT_YUYV) {
+			format.planesCount = 1;
+			format.planes[0].bpl  = cfg.size.width * 2;
+			format.planes[0].size = cfg.size.width * 2 * cfg.size.height;
+		}
 
 		LOG(RPI, Debug) << "Setting " << stream->name() << " to "
 				<< format;
@@ -816,9 +839,6 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		cfg.setStream(stream);
 		stream->setExternal(true);
 
-		if (i != maxIndex)
-			output1Set = true;
-		else
 			output0Set = true;
 	}
 
@@ -864,6 +884,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 	 * \todo If Output 1 format is not YUV420, Output 1 ought to be disabled as
 	 * colour denoise will not run.
 	 */
+#if 0
 	if (!output1Set) {
 		V4L2VideoDevice *dev = data->isp_[Isp::Output1].dev();
 
@@ -885,10 +906,11 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 			return -EINVAL;
 		}
 	}
+#endif
 
 	/* ISP statistics output format. */
 	format = {};
-	format.fourcc = V4L2PixelFormat(V4L2_META_FMT_BCM2835_ISP_STATS);
+	format.fourcc = V4L2PixelFormat(V4L2_META_FMT_XIL_ISP_LITE_STAT);
 	ret = data->isp_[Isp::Stats].dev()->setFormat(&format);
 	if (ret) {
 		LOG(RPI, Error) << "Failed to set format on ISP stats stream: "
@@ -1060,7 +1082,7 @@ int PipelineHandlerRPi::start(Camera *camera, const ControlList *controls)
 	}
 
 	/* Enable SOF event generation. */
-	data->unicam_[Unicam::Image].dev()->setFrameStartEnabled(true);
+	data->mipirx_->setFrameStartEnabled(true);
 
 	/*
 	 * Reset the delayed controls with the gain and exposure values set by
@@ -1097,7 +1119,7 @@ void PipelineHandlerRPi::stopDevice(Camera *camera)
 	data->state_ = RPiCameraData::State::Stopped;
 
 	/* Disable SOF event generation. */
-	data->unicam_[Unicam::Image].dev()->setFrameStartEnabled(false);
+	data->mipirx_->setFrameStartEnabled(false);
 
 	for (auto const stream : data->streams_)
 		stream->dev()->streamOff();
@@ -1158,7 +1180,8 @@ int PipelineHandlerRPi::queueRequestDevice(Camera *camera, Request *request)
 
 bool PipelineHandlerRPi::match(DeviceEnumerator *enumerator)
 {
-	DeviceMatch unicam("unicam");
+	DeviceMatch unicam("xilinx-video");
+	unicam.add("vcap_mipi_csi2_rx_ias1 output 0");
 	MediaDevice *unicamDevice = acquireMediaDevice(enumerator, unicam);
 
 	if (!unicamDevice) {
@@ -1166,7 +1189,8 @@ bool PipelineHandlerRPi::match(DeviceEnumerator *enumerator)
 		return false;
 	}
 
-	DeviceMatch isp("bcm2835-isp");
+	DeviceMatch isp("xilinx-video");
+	isp.add("isp_pipe_video_dev input 0");
 	MediaDevice *ispDevice = acquireMediaDevice(enumerator, isp);
 
 	if (!ispDevice) {
@@ -1208,17 +1232,19 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 	if (!data->dmaHeap_.isValid())
 		return -ENOMEM;
 
-	MediaEntity *unicamImage = unicam->getEntityByName("unicam-image");
-	MediaEntity *ispOutput0 = isp->getEntityByName("bcm2835-isp0-output0");
-	MediaEntity *ispCapture1 = isp->getEntityByName("bcm2835-isp0-capture1");
-	MediaEntity *ispCapture2 = isp->getEntityByName("bcm2835-isp0-capture2");
-	MediaEntity *ispCapture3 = isp->getEntityByName("bcm2835-isp0-capture3");
+	MediaEntity *unicamImage = unicam->getEntityByName("vcap_mipi_csi2_rx_ias1 output 0");
+	MediaEntity *unicamMipirx = unicam->getEntityByName("a0030000.mipi_rx_to_video");
+	MediaEntity *ispOutput0 = isp->getEntityByName("isp_pipe_video_dev input 0");
+	MediaEntity *ispCapture1 = isp->getEntityByName("isp_pipe_video_dev output 1");
+	//MediaEntity *ispCapture2 = isp->getEntityByName("bcm2835-isp0-capture2");
+	MediaEntity *ispCapture3 = isp->getEntityByName("xil-isp-lite_stat");
 
-	if (!unicamImage || !ispOutput0 || !ispCapture1 || !ispCapture2 || !ispCapture3)
+	if (!unicamImage || !unicamMipirx || !ispOutput0 || !ispCapture1 /*|| !ispCapture2*/ || !ispCapture3)
 		return -ENOENT;
 
 	/* Locate and open the unicam video streams. */
 	data->unicam_[Unicam::Image] = RPi::Stream("Unicam Image", unicamImage);
+	data->mipirx_ = std::make_unique<V4L2Subdevice>(unicamMipirx);
 
 	/* An embedded data node will not be present if the sensor does not support it. */
 	MediaEntity *unicamEmbedded = unicam->getEntityByName("unicam-embedded");
@@ -1231,16 +1257,16 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 	/* Tag the ISP input stream as an import stream. */
 	data->isp_[Isp::Input] = RPi::Stream("ISP Input", ispOutput0, true);
 	data->isp_[Isp::Output0] = RPi::Stream("ISP Output0", ispCapture1);
-	data->isp_[Isp::Output1] = RPi::Stream("ISP Output1", ispCapture2);
+	//data->isp_[Isp::Output1] = RPi::Stream("ISP Output1", ispCapture2);
 	data->isp_[Isp::Stats] = RPi::Stream("ISP Stats", ispCapture3);
 
 	/* Wire up all the buffer connections. */
 	data->unicam_[Unicam::Image].dev()->dequeueTimeout.connect(data.get(), &RPiCameraData::unicamTimeout);
-	data->unicam_[Unicam::Image].dev()->frameStart.connect(data.get(), &RPiCameraData::frameStarted);
+	data->mipirx_->frameStart.connect(data.get(), &RPiCameraData::frameStarted);
 	data->unicam_[Unicam::Image].dev()->bufferReady.connect(data.get(), &RPiCameraData::unicamBufferDequeue);
 	data->isp_[Isp::Input].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispInputDequeue);
 	data->isp_[Isp::Output0].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
-	data->isp_[Isp::Output1].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
+	//data->isp_[Isp::Output1].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
 	data->isp_[Isp::Stats].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
 
 	data->sensor_ = std::make_unique<CameraSensor>(sensorEntity);
@@ -1289,6 +1315,12 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 
 	for (auto stream : data->streams_) {
 		int ret = stream->dev()->open();
+		if (ret)
+			return ret;
+	}
+
+	{
+		int ret = data->mipirx_->open();
 		if (ret)
 			return ret;
 	}
@@ -1375,7 +1407,7 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 	std::set<Stream *> streams;
 	streams.insert(&data->unicam_[Unicam::Image]);
 	streams.insert(&data->isp_[Isp::Output0]);
-	streams.insert(&data->isp_[Isp::Output1]);
+	//streams.insert(&data->isp_[Isp::Output1]);
 
 	/* Create and register the camera. */
 	const std::string &id = data->sensor_->id();
@@ -1514,6 +1546,9 @@ void PipelineHandlerRPi::mapBuffers(Camera *camera, const RPi::BufferMap &buffer
 
 void RPiCameraData::freeBuffers()
 {
+	if (!buffersAllocated_)
+		return;
+
 	if (ipa_) {
 		/*
 		 * Copy the buffer ids from the unordered_set to a vector to
@@ -1589,7 +1624,7 @@ int RPiCameraData::configureIPA(const CameraConfiguration *config, ipa::RPi::IPA
 	}
 
 	entityControls.emplace(0, sensor_->controls());
-	entityControls.emplace(1, isp_[Isp::Input].dev()->controls());
+	entityControls.emplace(1, isp_[Isp::Stats].dev()->controls());
 
 	/* Always send the user transform to the IPA. */
 	ipaConfig.transform = static_cast<unsigned int>(config->transform);
@@ -1787,16 +1822,16 @@ void RPiCameraData::setIspControls(const ControlList &controls)
 {
 	ControlList ctrls = controls;
 
-	if (ctrls.contains(V4L2_CID_USER_BCM2835_ISP_LENS_SHADING)) {
-		ControlValue &value =
-			const_cast<ControlValue &>(ctrls.get(V4L2_CID_USER_BCM2835_ISP_LENS_SHADING));
-		Span<uint8_t> s = value.data();
-		bcm2835_isp_lens_shading *ls =
-			reinterpret_cast<bcm2835_isp_lens_shading *>(s.data());
-		ls->dmabuf = lsTable_.get();
-	}
+	// if (ctrls.contains(V4L2_CID_USER_BCM2835_ISP_LENS_SHADING)) {
+	// 	ControlValue &value =
+	// 		const_cast<ControlValue &>(ctrls.get(V4L2_CID_USER_BCM2835_ISP_LENS_SHADING));
+	// 	Span<uint8_t> s = value.data();
+	// 	bcm2835_isp_lens_shading *ls =
+	// 		reinterpret_cast<bcm2835_isp_lens_shading *>(s.data());
+	// 	ls->dmabuf = lsTable_.get();
+	// }
 
-	isp_[Isp::Input].dev()->setControls(&ctrls);
+	isp_[Isp::Stats].dev()->setControls(&ctrls);
 	handleState();
 }
 
@@ -2062,7 +2097,7 @@ void RPiCameraData::checkRequestCompleted()
 	 * frame.
 	 */
 	if (state_ == State::IpaComplete &&
-	    ((ispOutputCount_ == 3 && dropFrameCount_) || requestCompleted)) {
+	    ((ispOutputCount_ == 2 && dropFrameCount_) || requestCompleted)) {
 		state_ = State::Idle;
 		if (dropFrameCount_) {
 			dropFrameCount_--;

@@ -9,7 +9,7 @@
 #include <map>
 #include <tuple>
 
-#include <linux/bcm2835-isp.h>
+#include <linux/xil-isp-lite.h>
 
 #include <libcamera/base/log.h>
 
@@ -584,33 +584,10 @@ void Agc::fetchAwbStatus(Metadata *imageMetadata)
 		LOG(RPiAgc, Debug) << "No AWB status found";
 }
 
-static double computeInitialY(bcm2835_isp_stats *stats, AwbStatus const &awb,
-			      double weights[], double gain)
+static double computeInitialY(xil_isp_lite_stat_result *stats, AwbStatus const &/*awb*/,
+			      double /*weights*/[], double /*gain*/)
 {
-	bcm2835_isp_stats_region *regions = stats->agc_stats;
-	/*
-	 * Note how the calculation below means that equal weights give you
-	 * "average" metering (i.e. all pixels equally important).
-	 */
-	double rSum = 0, gSum = 0, bSum = 0, pixelSum = 0;
-	for (unsigned int i = 0; i < AgcStatsSize; i++) {
-		double counted = regions[i].counted;
-		double rAcc = std::min(regions[i].r_sum * gain, ((1 << PipelineBits) - 1) * counted);
-		double gAcc = std::min(regions[i].g_sum * gain, ((1 << PipelineBits) - 1) * counted);
-		double bAcc = std::min(regions[i].b_sum * gain, ((1 << PipelineBits) - 1) * counted);
-		rSum += rAcc * weights[i];
-		gSum += gAcc * weights[i];
-		bSum += bAcc * weights[i];
-		pixelSum += counted * weights[i];
-	}
-	if (pixelSum == 0.0) {
-		LOG(RPiAgc, Warning) << "computeInitialY: pixelSum is zero";
-		return 0;
-	}
-	double ySum = rSum * awb.gainR * .299 +
-		      gSum * awb.gainG * .587 +
-		      bSum * awb.gainB * .114;
-	return ySum / pixelSum / (1 << PipelineBits);
+	return stats->ae.sum / stats->ae.pix_cnt / 1024.0;
 }
 
 /*
@@ -629,17 +606,17 @@ static double constraintComputeGain(AgcConstraint &c, Histogram &h, double lux,
 	targetY = c.yTarget.eval(c.yTarget.domain().clip(lux));
 	targetY = std::min(EvGainYTargetLimit, targetY * evGain);
 	double iqm = h.interQuantileMean(c.qLo, c.qHi);
-	return (targetY * NUM_HISTOGRAM_BINS) / iqm;
+	return (targetY * XIL_ISP_LITE_AE_HIST_BIN_NUM) / iqm; //FIXME
 }
 
-void Agc::computeGain(bcm2835_isp_stats *statistics, Metadata *imageMetadata,
+void Agc::computeGain(xil_isp_lite_stat_result *statistics, Metadata *imageMetadata,
 		      double &gain, double &targetY)
 {
 	struct LuxStatus lux = {};
 	lux.lux = 400; /* default lux level to 400 in case no metadata found */
 	if (imageMetadata->get("lux.status", lux) != 0)
 		LOG(RPiAgc, Warning) << "No lux level found";
-	Histogram h(statistics->hist[0].g_hist, NUM_HISTOGRAM_BINS);
+	Histogram h(statistics->ae.hist_gr, XIL_ISP_LITE_AE_HIST_BIN_NUM); //FIXME
 	double evGain = status_.ev * config_.baseEv;
 	/*
 	 * The initial gain and target_Y come from some of the regions. After

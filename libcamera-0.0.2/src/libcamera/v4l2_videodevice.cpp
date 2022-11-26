@@ -447,7 +447,14 @@ const std::string V4L2DeviceFormat::toString() const
  */
 std::ostream &operator<<(std::ostream &out, const V4L2DeviceFormat &f)
 {
-	out << f.size << "-" << f.fourcc;
+	out << f.size << "-" << f.fourcc << "-planes[" << f.planesCount << "]";
+	if (f.planesCount > 0) {
+		out << "{";
+		for (unsigned int i = 0; i < f.planesCount; i++) {
+			out << f.planes[i].size << "/" << f.planes[i].bpl << ",";
+		}
+		out << "}";
+	}
 	return out;
 }
 
@@ -1593,7 +1600,7 @@ int V4L2VideoDevice::queueBuffer(FrameBuffer *buffer)
 
 	bool multiPlanar = V4L2_TYPE_IS_MULTIPLANAR(buf.type);
 	const std::vector<FrameBuffer::Plane> &planes = buffer->planes();
-	const unsigned int numV4l2Planes = format_.planesCount;
+	const unsigned int numV4l2Planes = format_.planesCount ?: 1;
 
 	/*
 	 * Ensure that the frame buffer has enough planes, and that they're

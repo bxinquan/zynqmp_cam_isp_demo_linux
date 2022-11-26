@@ -561,7 +561,7 @@ static int xvip_dma_start_streaming(struct vb2_queue *vq, unsigned int count)
 	 * We dont't want to start DMA in case of low latency capture mode,
 	 * applications will start DMA using S_CTRL at later point of time.
 	 */
-	if (!dma->low_latency_cap) {
+	if (!dma->low_latency_cap || V4L2_TYPE_IS_OUTPUT(dma->format.type)) {
 		dma_async_issue_pending(dma->dma);
 	} else {
 		/* For low latency capture, return the first buffer early
@@ -793,6 +793,50 @@ xvip_dma_enum_format(struct file *file, void *fh, struct v4l2_fmtdesc *f)
 		return PTR_ERR(fmt);
 
 	f->pixelformat = fmt->fourcc;
+
+	return 0;
+}
+
+static int
+xvip_dma_enum_framesizes(struct file *file, void *fh, struct v4l2_frmsizeenum *fsize)
+{
+	struct v4l2_fh *vfh = file->private_data;
+	struct xvip_dma *dma = to_xvip_dma(vfh->vdev);
+	struct v4l2_subdev *subdev;
+	const struct xvip_video_format *fmt;
+	struct v4l2_subdev_frame_size_enum fse = {0};
+	int ret;
+
+	/* Establish media pad format */
+	subdev = xvip_dma_remote_subdev(&dma->pad, &fse.pad);
+	if (!subdev)
+		return -EPIPE;
+
+	fmt = xvip_get_format_by_fourcc(fsize->pixel_format);
+	if (IS_ERR(fmt))
+		return PTR_ERR(fmt);
+
+	fse.code = fmt->code;
+	fse.index = fsize->index;
+	fse.which = V4L2_SUBDEV_FORMAT_ACTIVE;
+
+	ret = v4l2_subdev_call(subdev, pad, enum_frame_size, NULL, &fse);
+	if (ret < 0)
+		return ret;
+
+	if (fse.min_width == fse.max_width && fse.min_height == fse.max_height) {
+		fsize->type = V4L2_FRMSIZE_TYPE_DISCRETE;
+		fsize->discrete.width = fse.min_width;
+		fsize->discrete.height = fse.min_height;
+	} else {
+		fsize->type = V4L2_FRMSIZE_TYPE_STEPWISE;
+		fsize->stepwise.min_width = fse.min_width;
+		fsize->stepwise.max_width = fse.max_width;
+		fsize->stepwise.step_width = 1;
+		fsize->stepwise.min_height = fse.min_height;
+		fsize->stepwise.max_height = fse.max_height;
+		fsize->stepwise.step_height = 1;
+	}
 
 	return 0;
 }
@@ -1113,6 +1157,7 @@ static const struct v4l2_ioctl_ops xvip_dma_ioctl_ops = {
 	.vidioc_querycap		= xvip_dma_querycap,
 	.vidioc_enum_fmt_vid_cap	= xvip_dma_enum_format,
 	.vidioc_enum_fmt_vid_out	= xvip_dma_enum_format,
+	.vidioc_enum_framesizes	    = xvip_dma_enum_framesizes,
 	.vidioc_g_fmt_vid_cap		= xvip_dma_get_format,
 	.vidioc_g_fmt_vid_cap_mplane	= xvip_dma_get_format,
 	.vidioc_g_fmt_vid_out		= xvip_dma_get_format,
@@ -1204,10 +1249,12 @@ static int xvip_dma_open(struct file *file)
 	if (v4l2_fh_is_singular_file(file)) {
 		struct xvip_dma *dma = video_drvdata(file);
 
-		mutex_lock(&dma->lock);
-		dma->low_latency_cap = false;
-		xilinx_xdma_set_mode(dma->dma, AUTO_RESTART);
-		mutex_unlock(&dma->lock);
+		if (!V4L2_TYPE_IS_OUTPUT(dma->format.type)) {
+			mutex_lock(&dma->lock);
+			dma->low_latency_cap = false;
+			xilinx_xdma_set_mode(dma->dma, AUTO_RESTART);
+			mutex_unlock(&dma->lock);
+		}
 	}
 
 	return 0;

@@ -83,27 +83,20 @@ void Lux::process(StatisticsPtr &stats, Metadata *imageMetadata)
 	if (imageMetadata->get("device.status", deviceStatus) == 0) {
 		double currentGain = deviceStatus.analogueGain;
 		double currentAperture = deviceStatus.aperture.value_or(currentAperture_);
-		uint64_t sum = 0;
-		uint32_t num = 0;
-		uint32_t *bin = stats->hist[0].g_hist;
-		const int numBins = sizeof(stats->hist[0].g_hist) /
-				    sizeof(stats->hist[0].g_hist[0]);
-		for (int i = 0; i < numBins; i++)
-			sum += bin[i] * (uint64_t)i, num += bin[i];
 		/* add .5 to reflect the mid-points of bins */
-		double currentY = sum / (double)num + .5;
+		double currentY = stats->ae.sum / (double)stats->ae.pix_cnt + .5;
 		double gainRatio = referenceGain_ / currentGain;
 		double shutterSpeedRatio =
 			referenceShutterSpeed_ / deviceStatus.shutterSpeed;
 		double apertureRatio = referenceAperture_ / currentAperture;
-		double yRatio = currentY * (65536 / numBins) / referenceY_;
+		double yRatio = currentY * (65536 / 1024) / referenceY_;
 		double estimatedLux = shutterSpeedRatio * gainRatio *
 				      apertureRatio * apertureRatio *
 				      yRatio * referenceLux_;
 		LuxStatus status;
 		status.lux = estimatedLux;
 		status.aperture = currentAperture;
-		LOG(RPiLux, Debug) << ": estimated lux " << estimatedLux;
+		LOG(RPiLux, Debug) << ": estimated lux " << estimatedLux << ",  currentY " << currentY;
 		{
 			std::unique_lock<std::mutex> lock(mutex_);
 			status_ = status;
