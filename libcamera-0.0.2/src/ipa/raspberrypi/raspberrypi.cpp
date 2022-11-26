@@ -1066,10 +1066,9 @@ void IPARPi::prepareISP(const ISPConfig &data)
 	if (ccmStatus)
 		applyCCM(ccmStatus, ctrls);
 
-	//FIXME
-	//AgcStatus *dgStatus = rpiMetadata_.getLocked<AgcStatus>("agc.status");
-	//if (dgStatus)
-	//	applyDG(dgStatus, ctrls);
+	AgcStatus *dgStatus = rpiMetadata_.getLocked<AgcStatus>("agc.status");
+	if (dgStatus)
+		applyDG(dgStatus, ctrls);
 
 	AlscStatus *lsStatus = rpiMetadata_.getLocked<AlscStatus>("alsc.status");
 	if (lsStatus)
@@ -1147,12 +1146,12 @@ void IPARPi::processStats(unsigned int bufferId)
 
 void IPARPi::applyAWB(const struct AwbStatus *awbStatus, ControlList &ctrls)
 {
-	LOG(IPARPI, Debug) << "Applying WB R: " << awbStatus->gainR << " B: "
-			   << awbStatus->gainB;
+	LOG(IPARPI, Debug) << "Applying WB G: " << awbStatus->gainG << " R: "
+				<< awbStatus->gainR << " B: " << awbStatus->gainB;
 
 	xil_isp_lite_wb wb;
 	wb.enabled = 1;
-	wb.ggain = 1 * 16;
+	wb.ggain = awbStatus->gainG * 16;
 	wb.rgain = awbStatus->gainR * 16;
 	wb.bgain = awbStatus->gainB * 16;
 	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&wb),
@@ -1241,7 +1240,7 @@ void IPARPi::applyDG(const struct AgcStatus *dgStatus, ControlList &ctrls)
 	xil_isp_lite_dgain dgain;
 
 	dgain.enabled = 1;
-	dgain.gain = dgStatus->digitalGain * 16;
+	dgain.gain = static_cast<uint16_t>(dgStatus->digitalGain * 16);
 	dgain.offset = 0;
 
 	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&dgain),

@@ -88,7 +88,7 @@ static inline struct ar1335 *to_sensor(struct v4l2_subdev *sd)
 
 static const struct regval_list ar1335_3840x2160_20fps_raw10_48Mxclk[] = {
 	//[static struct vvsensor_ar1335_reg_value_t ar1335_init_setting_4kp_48Mxclk]
-	{0x301A, 0x0219},// RESET_REGISTER
+	{0x301A, 0x4219},// RESET_REGISTER
 	{REG_DELAY, 10},
 	{0x3042, 0x1004},// DARK_CONTROL2
 	{0x30D2, 0x0120},// CRM_CONTROL
@@ -398,11 +398,11 @@ static const struct regval_list ar1335_3840x2160_20fps_raw10_48Mxclk[] = {
 	{0x3F10, 0x0505},// SINGLE_K_FACTOR0
 	{0x3F40, 0x1511},// COUPLE_K_FACTOR0
 	{0x3F3C, 0x0003},// ANALOG_CONTROL9
-	{0x301A, 0x021C},// RESET_REGISTER
+	{0x301A, 0x421C},// RESET_REGISTER
 };
 
 static const struct regval_list ar1335_2048x1536_30fps_raw10_48Mxclk[] = {
-	{0x301A, 0x0219}, // RESET_REGISTER
+	{0x301A, 0x4219}, // RESET_REGISTER
 	{REG_DELAY, 10},
 	{0x3042, 0x1004}, // DARK_CONTROL2
 	{0x30D2, 0x0120}, // CRM_CONTROL
@@ -711,11 +711,11 @@ static const struct regval_list ar1335_2048x1536_30fps_raw10_48Mxclk[] = {
 	{0x3F10, 0x0505}, // SINGLE_K_FACTOR0
 	{0x3F40, 0x1511}, // COUPLE_K_FACTOR0
 	{0x3F3C, 0x0003}, // ANALOG_CONTROL9
-	{0x301A, 0x021C}, // RESET_REGISTER
+	{0x301A, 0x421C}, // RESET_REGISTER
 };
 
 static const struct regval_list ar1335_1920x1080_30fps_raw10_48Mxclk[] = {
-	{0x301A, 0x0219}, // RESET_REGISTER
+	{0x301A, 0x4219}, // RESET_REGISTER
 	{REG_DELAY, 10},
 	{0x3042, 0x1004}, // DARK_CONTROL2
 	{0x30D2, 0x0120}, // CRM_CONTROL
@@ -1024,7 +1024,7 @@ static const struct regval_list ar1335_1920x1080_30fps_raw10_48Mxclk[] = {
 	{0x3F10, 0x0505}, // SINGLE_K_FACTOR0
 	{0x3F40, 0x1511}, // COUPLE_K_FACTOR0
 	{0x3F3C, 0x0003}, // ANALOG_CONTROL9
-	{0x301A, 0x021C}, // RESET_REGISTER
+	{0x301A, 0x421C}, // RESET_REGISTER
 };
 
 #define AR1335_PIXEL_FORMAT  MEDIA_BUS_FMT_SGRBG10_1X10
