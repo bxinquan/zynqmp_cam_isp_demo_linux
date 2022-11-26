@@ -11,6 +11,7 @@
 #include <libcamera/base/log.h>
 
 #include "../device_status.h"
+#include "../agc_status.h"
 
 #include "lux.h"
 
@@ -80,8 +81,13 @@ void Lux::prepare(Metadata *imageMetadata)
 void Lux::process(StatisticsPtr &stats, Metadata *imageMetadata)
 {
 	DeviceStatus deviceStatus;
+	AgcStatus agcStatus;
+	if (imageMetadata->get("agc.status", agcStatus) != 0) {
+		LOG(RPiLux, Warning) << ": no agc status in metadata";
+		agcStatus.digitalGain = 1.0;
+	}
 	if (imageMetadata->get("device.status", deviceStatus) == 0) {
-		double currentGain = deviceStatus.analogueGain;
+		double currentGain = deviceStatus.analogueGain * agcStatus.digitalGain;
 		double currentAperture = deviceStatus.aperture.value_or(currentAperture_);
 		/* add .5 to reflect the mid-points of bins */
 		double currentY = stats->ae.sum / (double)stats->ae.pix_cnt + .5;

@@ -585,9 +585,10 @@ void Agc::fetchAwbStatus(Metadata *imageMetadata)
 }
 
 static double computeInitialY(xil_isp_lite_stat_result *stats, AwbStatus const &/*awb*/,
-			      double /*weights*/[], double /*gain*/)
+			      double /*weights*/[], double gain, double digitalGain)
 {
-	return stats->ae.sum / stats->ae.pix_cnt / 1024.0;
+	double yAvg = stats->ae.sum / stats->ae.pix_cnt / digitalGain / 1024.0;
+	return std::min(yAvg * gain, 1.0);
 }
 
 /*
@@ -631,7 +632,8 @@ void Agc::computeGain(xil_isp_lite_stat_result *statistics, Metadata *imageMetad
 	 */
 	gain = 1.0;
 	for (int i = 0; i < 8; i++) {
-		double initialY = computeInitialY(statistics, awb_, meteringMode_->weights, gain);
+		double initialY = computeInitialY(statistics, awb_, meteringMode_->weights,
+				gain, status_.digitalGain);
 		double extraGain = std::min(10.0, targetY / (initialY + .001));
 		gain *= extraGain;
 		LOG(RPiAgc, Debug) << "Initial Y " << initialY << " target " << targetY
