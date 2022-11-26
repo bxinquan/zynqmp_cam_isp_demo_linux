@@ -1,4 +1,4 @@
-prefix=/home/bxinquan/libcamera-0.0.2/install_arm64
+prefix=/home/bxinquan/zynqmp_cam_isp_demo_linux/libcamera-0.0.2/install_arm64
 libdir=${prefix}/lib
 includedir=${prefix}/include
 
