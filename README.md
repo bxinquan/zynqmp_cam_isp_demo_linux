@@ -35,6 +35,7 @@ media-ctl --set-v4l2 '"axi:camif_ias1_axis_subsetconv":1[fmt:Y10_1X10/2048x1536]
 #配置ISP,VIP格式
 media-ctl -d /dev/media1 --set-v4l2 '"a0070000.xil_isp_lite":0[fmt:Y10_1X10/2048x1536 field:none]'
 media-ctl -d /dev/media1 --set-v4l2 '"a00a0000.xil_vip":1[fmt:UYVY8_1X16/1920x1080 field:none]'
+v4l2-ctl -d /dev/video1 -c low_latency_controls=2
 v4l2-ctl -d /dev/video2 -c low_latency_controls=2
 ```
 
