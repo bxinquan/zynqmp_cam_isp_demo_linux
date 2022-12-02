@@ -1600,7 +1600,7 @@ int V4L2VideoDevice::queueBuffer(FrameBuffer *buffer)
 
 	bool multiPlanar = V4L2_TYPE_IS_MULTIPLANAR(buf.type);
 	const std::vector<FrameBuffer::Plane> &planes = buffer->planes();
-	const unsigned int numV4l2Planes = format_.planesCount ?: 1;
+	const unsigned int numV4l2Planes = format_.planesCount;
 
 	/*
 	 * Ensure that the frame buffer has enough planes, and that they're

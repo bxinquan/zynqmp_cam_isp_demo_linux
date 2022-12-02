@@ -623,13 +623,13 @@ PipelineHandlerRPi::generateConfiguration(Camera *camera, const StreamRoles &rol
 			 * algorithm.
 			 */
 			fmts = data->isp_[Isp::Output0].dev()->formats();
-			pixelFormat = formats::RGB888;
+			pixelFormat = formats::YUV420;
 			/*
 			 * Choose a color space appropriate for video recording.
 			 * Rec.709 will be a good default for HD resolutions.
 			 */
 			colorSpace = ColorSpace::Rec709;
-			size = { 2048, 1536 };
+			size = { 1920, 1080 };
 			bufferCount = 4;
 			outCount++;
 			break;
