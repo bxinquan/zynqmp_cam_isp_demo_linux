@@ -1,9 +1,9 @@
 #libevent pkg-config source file
 
-prefix=/home/bxinquan/libevent-2.1.12-stable/install_arm64
-exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
 
 Name: libevent_pthreads
 Description: libevent_pthreads adds pthreads-based threading support to libevent
