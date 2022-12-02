@@ -1,5 +1,6 @@
 # zynqmp_cam_isp_demo_linux
 [zynqmp_cam_isp_demo](https://github.com/bxinquan/zynqmp_cam_isp_demo) linux软件项目
+安装[xilinx-zynqmp-common-v2022.1](https://www.xilinx.com/member/forms/download/xef.html?filename=xilinx-zynqmp-common-v2022.1_04191534.tar.gz)/sdk.sh
 待更新
 
 

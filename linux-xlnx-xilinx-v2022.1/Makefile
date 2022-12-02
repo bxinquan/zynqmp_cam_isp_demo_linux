@@ -383,7 +383,7 @@ include $(srctree)/scripts/subarch.include
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 # ARCH		?= $(SUBARCH)
 ARCH		?= arm64
-CROSS_COMPILE	?= aarch64-linux-gnu-
+CROSS_COMPILE	?= aarch64-xilinx-linux-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
