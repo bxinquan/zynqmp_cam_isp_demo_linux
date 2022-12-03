@@ -69,11 +69,12 @@ static void yuyv_save(std::vector<libcamera::Span<uint8_t>> const &mem, StreamIn
 			throw std::runtime_error("failed to open file " + filename);
 		try
 		{
+			unsigned int stride = info.stride ? info.stride : info.width * 2;
 			// We could doubtless do this much quicker. Though starting with
 			// YUV420 planar buffer would have been nice.
 			std::vector<uint8_t> row(info.width);
 			uint8_t *ptr = (uint8_t *)mem[0].data();
-			for (unsigned int j = 0; j < info.height; j++, ptr += info.stride)
+			for (unsigned int j = 0; j < info.height; j++, ptr += stride)
 			{
 				for (unsigned int i = 0; i < info.width; i++)
 					row[i] = ptr[i << 1];
@@ -81,7 +82,7 @@ static void yuyv_save(std::vector<libcamera::Span<uint8_t>> const &mem, StreamIn
 					throw std::runtime_error("failed to write file " + filename);
 			}
 			ptr = (uint8_t *)mem[0].data();
-			for (unsigned int j = 0; j < info.height; j += 2, ptr += 2 * info.stride)
+			for (unsigned int j = 0; j < info.height; j += 2, ptr += 2 * stride)
 			{
 				for (unsigned int i = 0; i < info.width / 2; i++)
 					row[i] = ptr[(i << 2) + 1];
@@ -89,7 +90,7 @@ static void yuyv_save(std::vector<libcamera::Span<uint8_t>> const &mem, StreamIn
 					throw std::runtime_error("failed to write file " + filename);
 			}
 			ptr = (uint8_t *)mem[0].data();
-			for (unsigned int j = 0; j < info.height; j += 2, ptr += 2 * info.stride)
+			for (unsigned int j = 0; j < info.height; j += 2, ptr += 2 * stride)
 			{
 				for (unsigned int i = 0; i < info.width / 2; i++)
 					row[i] = ptr[(i << 2) + 3];
