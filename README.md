@@ -57,4 +57,9 @@ cam -c 1 -s width=1920,height=1080,pixelformat=YUYV,role=video,colorspace=rec709
 gst-launch-1.0 libcamerasrc camera-name="/base/axi/i2c@a0010000/camera@36" ! video/x-raw,format=YUY2,width=1920,height=1080,framerate=30/1 ! kmssink bus-id=fd4a0000.display fullscreen-overlay=1 async=false
 ```
 
+```
+#libcamera-apps测试
+libcamera-still --mode 2048:1536:10:P -n --width 1920 --height 1080 -r -o image.jpg
+```
+
 ![image](https://github.com/bxinquan/zynqmp_cam_isp_demo_linux/blob/main/Doc/cmd.png)
