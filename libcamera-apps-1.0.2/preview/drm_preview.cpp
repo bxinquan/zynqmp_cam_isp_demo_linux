@@ -225,7 +225,7 @@ void DrmPreview::findPlane()
 
 DrmPreview::DrmPreview(Options const *options) : Preview(options), last_fd_(-1), first_time_(true)
 {
-	drmfd_ = drmOpen("vc4", NULL);
+	drmfd_ = drmOpen(NULL, "fd4a0000.display");
 	if (drmfd_ < 0)
 		throw std::runtime_error("drmOpen failed: " + std::string(ERRSTR));
 
@@ -243,7 +243,7 @@ DrmPreview::DrmPreview(Options const *options) : Preview(options), last_fd_(-1),
 
 		conId_ = 0;
 		findCrtc();
-		out_fourcc_ = DRM_FORMAT_YUV420;
+		out_fourcc_ = DRM_FORMAT_YUYV;
 		findPlane();
 	}
 	catch (std::exception const &e)
@@ -363,7 +363,7 @@ void DrmPreview::makeBuffer(int fd, size_t size, StreamInfo const &info, Buffer 
 
 	uint32_t offsets[4] =
 		{ 0, info.stride * info.height, info.stride * info.height + (info.stride / 2) * (info.height / 2) };
-	uint32_t pitches[4] = { info.stride, info.stride / 2, info.stride / 2 };
+	uint32_t pitches[4] = { info.stride?info.stride:info.width*2, info.stride / 2, info.stride / 2 };
 	uint32_t bo_handles[4] = { buffer.bo_handle, buffer.bo_handle, buffer.bo_handle };
 
 	if (drmModeAddFB2(drmfd_, info.width, info.height, out_fourcc_, bo_handles, pitches, offsets, &buffer.fb_handle, 0))

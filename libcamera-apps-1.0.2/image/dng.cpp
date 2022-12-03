@@ -41,6 +41,7 @@ static const std::map<PixelFormat, BayerFormat> bayer_formats =
 	{ formats::SGBRG12_CSI2P, { "GBRG-12", 12, TIFF_GBRG } },
 };
 
+#if 0
 static void unpack_10bit(uint8_t *src, StreamInfo const &info, uint16_t *dest)
 {
 	unsigned int w_align = info.width & ~3;
@@ -57,6 +58,25 @@ static void unpack_10bit(uint8_t *src, StreamInfo const &info, uint16_t *dest)
 		}
 		for (; x < info.width; x++)
 			*dest++ = (ptr[x & 3] << 2) | ((ptr[4] >> ((x & 3) << 1)) & 3);
+	}
+}
+#endif
+
+static void unpack_10bit_xy10(uint8_t *src, StreamInfo const &info, uint16_t *dest)
+{
+	unsigned int w_align = info.width / 3 * 3;
+	for (unsigned int y = 0; y < info.height; y++, src += info.stride)
+	{
+		uint32_t *ptr = (uint32_t*)src;
+		unsigned int x;
+		for (x = 0; x < w_align; x += 3, ptr += 1)
+		{
+			*dest++ = (*ptr >>  0) & 0x03ff;
+			*dest++ = (*ptr >> 10) & 0x03ff;
+			*dest++ = (*ptr >> 20) & 0x03ff;
+		}
+		for (; x < info.width; x++)
+			*dest++ = (*ptr >> ((x - w_align) * 10)) & 0x03ff;
 	}
 }
 
@@ -140,7 +160,7 @@ void dng_save(std::vector<libcamera::Span<uint8_t>> const &mem, StreamInfo const
 
 	std::vector<uint16_t> buf(info.width * info.height);
 	if (bayer_format.bits == 10)
-		unpack_10bit((uint8_t *)mem[0].data(), info, &buf[0]);
+		unpack_10bit_xy10((uint8_t *)mem[0].data(), info, &buf[0]);
 	else if (bayer_format.bits == 12)
 		unpack_12bit((uint8_t *)mem[0].data(), info, &buf[0]);
 	else

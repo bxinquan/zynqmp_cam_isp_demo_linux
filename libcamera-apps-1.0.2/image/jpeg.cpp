@@ -287,9 +287,10 @@ static void YUYV_to_JPEG(const uint8_t *input, StreamInfo const &info,
 		h_offset[k++] = off_align + 1;
 		h_offset[k++] = off_align + 3;
 	}
+	unsigned int stride = info.stride ? info.stride : info.width * 2;
 	while (cinfo.next_scanline < output_height)
 	{
-		unsigned int offset = ((cinfo.next_scanline * info.height) / output_height) * info.stride;
+		unsigned int offset = ((cinfo.next_scanline * info.height) / output_height) * stride;
 		for (unsigned int k = 0; k < output_width3; k += 3)
 		{
 			tmp_row[k] = input[offset + h_offset[k]];
