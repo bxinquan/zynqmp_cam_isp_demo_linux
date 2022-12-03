@@ -487,7 +487,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 		count++;
 
 		/* Can only output 1 RAW stream, or 2 YUV/RGB streams. */
-		if (rawCount > 1 || outCount > 2) {
+		if (rawCount > 1 || outCount > 1) {
 			LOG(RPI, Error) << "Invalid number of streams requested";
 			return Invalid;
 		}
@@ -649,7 +649,7 @@ PipelineHandlerRPi::generateConfiguration(Camera *camera, const StreamRoles &rol
 			return nullptr;
 		}
 
-		if (rawCount > 1 || outCount > 2) {
+		if (rawCount > 1 || outCount > 1) {
 			LOG(RPI, Error) << "Invalid stream roles requested";
 			return nullptr;
 		}

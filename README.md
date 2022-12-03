@@ -60,6 +60,8 @@ gst-launch-1.0 libcamerasrc camera-name="/base/axi/i2c@a0010000/camera@36" ! vid
 ```
 #libcamera-apps测试
 libcamera-still --mode 2048:1536:10:P -n --width 1920 --height 1080 -r -o image.jpg
+libcamera-still --mode 2048:1536:10:P -n --width 1920 --height 1080 -r -e yuv420 -o image.yuv
+libcamera-still --mode 2048:1536:10:P -n --width 1920 --height 1080 -r -e yuv420 -o image.yuv --shutter 33333.0 --analoggain 4.0
 ```
 
 ![image](https://github.com/bxinquan/zynqmp_cam_isp_demo_linux/blob/main/Doc/cmd.png)
