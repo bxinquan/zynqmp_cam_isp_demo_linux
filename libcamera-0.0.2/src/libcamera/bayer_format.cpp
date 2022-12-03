@@ -104,8 +104,13 @@ const std::map<BayerFormat, Formats, BayerFormatComparator> bayerToFormat{
 		{ formats::SBGGR10, V4L2PixelFormat(V4L2_PIX_FMT_SBGGR10) } },
 	{ { BayerFormat::GBRG, 10, BayerFormat::Packing::None },
 		{ formats::SGBRG10, V4L2PixelFormat(V4L2_PIX_FMT_SGBRG10) } },
+#if 1 //XXX by bxq
+	{ { BayerFormat::GRBG, 10, BayerFormat::Packing::None },
+		{ formats::SGRBG10, V4L2PixelFormat(V4L2_PIX_FMT_XY10) } },
+#else
 	{ { BayerFormat::GRBG, 10, BayerFormat::Packing::None },
 		{ formats::SGRBG10, V4L2PixelFormat(V4L2_PIX_FMT_SGRBG10) } },
+#endif
 	{ { BayerFormat::RGGB, 10, BayerFormat::Packing::None },
 		{ formats::SRGGB10, V4L2PixelFormat(V4L2_PIX_FMT_SRGGB10) } },
 	{ { BayerFormat::BGGR, 10, BayerFormat::Packing::CSI2 },

@@ -751,14 +751,19 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		data->setSensorControls(controls);
 	}
 
-	//XXX not change sensor output size
+#if 1 //XXX by bxq, not change sensor output size
 	IPACameraSensorInfo sensorInfo;
 	ret = data->sensor_->sensorInfo(&sensorInfo);
 	if (ret) {
 		LOG(RPI, Error) << "Failed to retrieve camera sensor info";
 		return ret;
 	}
-	maxSize = sensorInfo.outputSize;
+	if (sensorSize > sensorInfo.outputSize || maxSize > sensorInfo.outputSize) {
+		LOG(RPI, Error) << "Invalid Stream size. sensorOutput " << sensorInfo.outputSize << ", rawSize " << sensorSize << ", maxSize " << maxSize;
+		return -EINVAL;
+	}
+	sensorSize = maxSize = sensorInfo.outputSize;
+#endif
 
 	/* First calculate the best sensor mode we can use based on the user request. */
 	V4L2SubdeviceFormat sensorFormat = findBestFormat(data->sensorFormats_, rawStream ? sensorSize : maxSize, bitDepth);

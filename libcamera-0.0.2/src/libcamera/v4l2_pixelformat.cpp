@@ -157,8 +157,13 @@ const std::map<V4L2PixelFormat, V4L2PixelFormat::Info> vpf2pf{
 		{ formats::SBGGR10_CSI2P, "10-bit Bayer BGBG/GRGR Packed" } },
 	{ V4L2PixelFormat(V4L2_PIX_FMT_SGBRG10P),
 		{ formats::SGBRG10_CSI2P, "10-bit Bayer GBGB/RGRG Packed" } },
+#if 1 //XXX by bxq
+	{ V4L2PixelFormat(V4L2_PIX_FMT_XY10),
+		{ formats::SGRBG10_CSI2P, "10-bit Bayer GRGR/BGBG Packed" } },
+#else
 	{ V4L2PixelFormat(V4L2_PIX_FMT_SGRBG10P),
 		{ formats::SGRBG10_CSI2P, "10-bit Bayer GRGR/BGBG Packed" } },
+#endif
 	{ V4L2PixelFormat(V4L2_PIX_FMT_SRGGB10P),
 		{ formats::SRGGB10_CSI2P, "10-bit Bayer RGRG/GBGB Packed" } },
 	{ V4L2PixelFormat(V4L2_PIX_FMT_SBGGR12),
