@@ -62,7 +62,7 @@ gst-launch-1.0 libcamerasrc camera-name="/base/axi/i2c@a0010000/camera@36" ! vid
 modetest -D fd4a0000.display -w 40:alpha:0 #Primary Plane全透明,让Overlay Plane显示
 libcamera-hello -t 0
 libcamera-hello -t 0 --ev -1.0
-libcamera-hello -t 0 --shutter 33333.0 --analoggain 4.0
+libcamera-hello -t 0 --shutter 33333.0 --analoggain 4.0 --awbgains 1.0,1.0 --denoise off --sharpness 0
 libcamera-still --mode 2048:1536:10:P --width 1920 --height 1080 -r -o image.jpg
 libcamera-still --mode 2048:1536:10:P --width 1920 --height 1080 -r -e yuv420 -o image.yuv --shutter 33333.0 --analoggain 4.0
 ```

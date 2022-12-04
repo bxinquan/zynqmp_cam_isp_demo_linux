@@ -1296,6 +1296,28 @@ void IPARPi::applyGEQ([[maybe_unused]] const struct GeqStatus *geqStatus, [[mayb
 {
 }
 
+//spaceKernel = x_bf_makeSpaceKern(7, 10, 31); print(spaceKernel)
+static const unsigned char spaceWeightTbl_10[7*7] = {
+		28, 29, 29, 30, 29, 29, 28,
+		29, 30, 30, 30, 30, 30, 29,
+		29, 30, 31, 31, 31, 30, 29,
+		30, 30, 31, 31, 31, 30, 30,
+		29, 30, 31, 31, 31, 30, 29,
+		29, 30, 30, 30, 30, 30, 29,
+		28, 29, 29, 30, 29, 29, 28
+	};
+//colorCurve = x_bf_makeColorCurve(9, 34, 10, 31); print(colorCurve)
+static const unsigned char colorCurveTbl_10[9][2] = {
+		{ 3, 30},
+		{ 6, 26},
+		{10, 19},
+		{13, 13},
+		{17,  7},
+		{20,  4},
+		{23,  2},
+		{27,  1},
+		{30,  0}
+	};
 void IPARPi::applyDenoise([[maybe_unused]] const struct DenoiseStatus *denoiseStatus, [[maybe_unused]] ControlList &ctrls)
 {
 	using RPiController::DenoiseMode;
@@ -1309,6 +1331,20 @@ void IPARPi::applyDenoise([[maybe_unused]] const struct DenoiseStatus *denoiseSt
 	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&bnr),
 					    sizeof(bnr) });
 	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_BNR, c);
+
+	xil_isp_lite_2dnr nr2d;
+	nr2d.enabled = mode != DenoiseMode::Off;
+	for (unsigned i = 0; i < sizeof(nr2d.space_weight)/sizeof(nr2d.space_weight[0]); i++) {
+		nr2d.space_weight[i] = spaceWeightTbl_10[i];
+	}
+	for (unsigned i = 0; i < sizeof(nr2d.color_curve)/sizeof(nr2d.color_curve[0]); i++) {
+		nr2d.color_curve[i][0] = colorCurveTbl_10[i][0];
+		nr2d.color_curve[i][1] = colorCurveTbl_10[i][1];
+	}
+
+	ControlValue c2(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&nr2d),
+					    sizeof(nr2d) });
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_2DNR, c2);
 }
 
 void IPARPi::applySharpen([[maybe_unused]] const struct SharpenStatus *sharpenStatus, [[maybe_unused]] ControlList &ctrls)
