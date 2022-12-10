@@ -113,7 +113,7 @@ struct xil_isp_lite_csc {
 
 struct xil_isp_lite_gamma {
 	__u32 enabled;
-	__u8  gamma_table[256];
+	__u8  gamma_table[64];
 };
 
 struct xil_isp_lite_2dnr {
