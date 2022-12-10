@@ -11,7 +11,7 @@
  * of contrast stretching based on the AGC histogram.
  */
 
-constexpr unsigned int ContrastNumPoints = 33;
+constexpr unsigned int ContrastNumPoints = 65;
 
 struct ContrastPoint {
 	uint16_t x;

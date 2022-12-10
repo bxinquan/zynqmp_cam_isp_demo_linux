@@ -1265,16 +1265,24 @@ void IPARPi::applyCCM(const struct CcmStatus *ccmStatus, ControlList &ctrls)
 
 void IPARPi::applyGamma([[maybe_unused]] const struct ContrastStatus *contrastStatus, [[maybe_unused]] ControlList &ctrls)
 {
-	//struct xil_isp_lite_gamma gamma;
+	struct xil_isp_lite_gamma gamma;
+	gamma.enabled = 1;
 
-	//gamma.enabled = 1;
-	//for (unsigned int i = 0; i < ContrastNumPoints; i++) {
-	//	//TODO
-	//}
+	if (ContrastNumPoints - 1 != sizeof(gamma.gamma_table)/sizeof(gamma.gamma_table[0])) {
+		LOG(IPARPI, Error) << "Invalid gamma table size. ContrastNumPoints " << ContrastNumPoints << " , driver " << sizeof(gamma.gamma_table)/sizeof(gamma.gamma_table[0]);
+		return;
+	}
+	for (unsigned int i = 0; i < ContrastNumPoints - 1; i++) {
+		if (contrastStatus->points[i].x != 65536 / (ContrastNumPoints - 1) * i) {
+			LOG(IPARPI, Error) << "Invalid gamma table points[" << i << "] : " << contrastStatus->points[i].x << " , " << contrastStatus->points[i].y;
+			return;
+		}
+		gamma.gamma_table[i] = contrastStatus->points[i].y / (65536 / (ContrastNumPoints - 1));
+	}
 
-	//ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&gamma),
-	//				    sizeof(gamma) });
-	//ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_GAMMA, c);
+	ControlValue c(Span<const uint8_t>{ reinterpret_cast<uint8_t *>(&gamma),
+					    sizeof(gamma) });
+	ctrls.set(V4L2_CID_USER_XIL_ISP_LITE_GAMMA, c);
 }
 
 void IPARPi::applyBlackLevel(const struct BlackLevelStatus *blackLevelStatus, ControlList &ctrls)

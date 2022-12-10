@@ -71,9 +71,10 @@ static void fillInStatus(ContrastStatus &status, double brightness,
 	status.brightness = brightness;
 	status.contrast = contrast;
 	for (unsigned int i = 0; i < ContrastNumPoints - 1; i++) {
-		int x = i < 16 ? i * 1024
-			       : (i < 24 ? (i - 16) * 2048 + 16384
-					 : (i - 24) * 4096 + 32768);
+		// int x = i < 16 ? i * 1024
+		// 	       : (i < 24 ? (i - 16) * 2048 + 16384
+		// 			 : (i - 24) * 4096 + 32768);
+		int x = 65536 / (ContrastNumPoints - 1) * i;
 		status.points[i].x = x;
 		status.points[i].y = std::min(65535.0, gammaCurve.eval(x));
 	}
