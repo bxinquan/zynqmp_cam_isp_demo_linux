@@ -1,0 +1,8 @@
+config ALLEGRO_VCU_ENC_DRIVER
+    tristate "Allegro VCU Encoder"
+    depends on HAS_DMA
+    select DMA_SHARED_BUFFER
+    help
+        Enables Allegro VCU Encoder driver.
+        To compile this driver as a module, choose M here.
+

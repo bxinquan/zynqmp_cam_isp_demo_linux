@@ -180,7 +180,7 @@ V4L2SubdeviceFormat findBestFormat(const SensorFormats &formatsMap, const Size &
 }
 
 enum class Unicam : unsigned int { Image, Embedded };
-enum class Isp : unsigned int { Input, Output0, Stats };
+enum class Isp : unsigned int { Input, Output0, Output1, Stats };
 
 } /* namespace */
 
@@ -234,7 +234,7 @@ public:
 	/* Array of Unicam and ISP device streams and associated buffers/streams. */
 	std::unique_ptr<V4L2Subdevice> mipirx_;
 	RPi::Device<Unicam, 2> unicam_;
-	RPi::Device<Isp, 3> isp_;
+	RPi::Device<Isp, 4> isp_;
 	/* The vector below is just for convenience when iterating over all streams. */
 	std::vector<RPi::Stream *> streams_;
 	/* Stores the ids of the buffers mapped in the IPA. */
@@ -426,7 +426,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 	 */
 	combinedTransform_ = combined;
 
-	unsigned int rawCount = 0, outCount = 0, count = 0;
+	unsigned int rawCount = 0, outCount = 0, count = 0, maxIndex = 0;
 	std::pair<int, Size> outSize[2];
 	Size maxSize;
 	for (StreamConfiguration &cfg : config_) {
@@ -480,6 +480,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 			/* Record the largest resolution for fixups later. */
 			if (maxSize < cfg.size) {
 				maxSize = cfg.size;
+				maxIndex = outCount;
 			}
 			outCount++;
 		}
@@ -487,7 +488,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 		count++;
 
 		/* Can only output 1 RAW stream, or 2 YUV/RGB streams. */
-		if (rawCount > 1 || outCount > 1) {
+		if (rawCount > 1 || outCount > 2) {
 			LOG(RPI, Error) << "Invalid number of streams requested";
 			return Invalid;
 		}
@@ -521,7 +522,10 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 		PixelFormat &cfgPixFmt = cfg.pixelFormat;
 		V4L2VideoDevice *dev;
 
+		if (i == maxIndex)
 			dev = data_->isp_[Isp::Output0].dev();
+		else
+			dev = data_->isp_[Isp::Output1].dev();
 
 		V4L2VideoDevice::Formats fmts = dev->formats();
 
@@ -649,8 +653,8 @@ PipelineHandlerRPi::generateConfiguration(Camera *camera, const StreamRoles &rol
 			return nullptr;
 		}
 
-		if (rawCount > 1 || outCount > 1) {
-			LOG(RPI, Error) << "Invalid stream roles requested";
+		if (rawCount > 1 || outCount > 2) {
+			LOG(RPI, Error) << "Invalid stream roles requested, rawCount " << rawCount << "  outCount " << outCount;
 			return nullptr;
 		}
 
@@ -707,6 +711,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 
 	BayerFormat::Packing packing = BayerFormat::Packing::CSI2;
 	Size maxSize, sensorSize;
+	unsigned int maxIndex = 0;
 	bool rawStream = false;
 	unsigned int bitDepth = defaultRawBitDepth;
 
@@ -731,6 +736,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		} else {
 			if (cfg.size > maxSize) {
 				maxSize = config->at(i).size;
+				maxIndex = i;
 			}
 		}
 	}
@@ -790,7 +796,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 	 * StreamConfiguration appropriately.
 	 */
 	V4L2DeviceFormat format;
-	bool output0Set = false;
+	bool output0Set = false, output1Set = false;
 	for (unsigned i = 0; i < config->size(); i++) {
 		StreamConfiguration &cfg = config->at(i);
 
@@ -801,7 +807,8 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		}
 
 		/* The largest resolution gets routed to the ISP Output 0 node. */
-		RPi::Stream *stream = &data->isp_[Isp::Output0];
+		RPi::Stream *stream = i == maxIndex ? &data->isp_[Isp::Output0]
+						    : &data->isp_[Isp::Output1];
 
 		V4L2PixelFormat fourcc = stream->dev()->toV4L2PixelFormat(cfg.pixelFormat);
 		format.size = cfg.size;
@@ -844,6 +851,9 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		cfg.setStream(stream);
 		stream->setExternal(true);
 
+		if (i != maxIndex)
+			output1Set = true;
+		else
 			output0Set = true;
 	}
 
@@ -859,13 +869,15 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 	 */
 	if (!output0Set) {
 		V4L2VideoDevice *dev = data->isp_[Isp::Output0].dev();
-
+#if 1 //by bxq
+#else
 		maxSize = Size(320, 240);
 		format = {};
 		format.size = maxSize;
 		format.fourcc = dev->toV4L2PixelFormat(formats::YUV420);
 		/* No one asked for output, so the color space doesn't matter. */
 		format.colorSpace = ColorSpace::Sycc;
+#endif
 		ret = dev->setFormat(&format);
 		if (ret) {
 			LOG(RPI, Error)
@@ -889,10 +901,12 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 	 * \todo If Output 1 format is not YUV420, Output 1 ought to be disabled as
 	 * colour denoise will not run.
 	 */
-#if 0
 	if (!output1Set) {
 		V4L2VideoDevice *dev = data->isp_[Isp::Output1].dev();
 
+#if 1 //by bxq
+		V4L2DeviceFormat output1Format = format;
+#else
 		V4L2DeviceFormat output1Format;
 		constexpr Size maxDimensions(1200, 1200);
 		const Size limit = maxDimensions.boundedToAspectRatio(format.size);
@@ -900,7 +914,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		output1Format.size = (format.size / 2).boundedTo(limit).alignedDownTo(2, 2);
 		output1Format.colorSpace = format.colorSpace;
 		output1Format.fourcc = dev->toV4L2PixelFormat(formats::YUV420);
-
+#endif
 		LOG(RPI, Debug) << "Setting ISP Output1 (internal) to "
 				<< output1Format;
 
@@ -911,7 +925,6 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 			return -EINVAL;
 		}
 	}
-#endif
 
 	/* ISP statistics output format. */
 	format = {};
@@ -1238,13 +1251,13 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 		return -ENOMEM;
 
 	MediaEntity *unicamImage = unicam->getEntityByName("vcap_mipi_csi2_rx_ias1 output 0");
-	MediaEntity *unicamMipirx = unicam->getEntityByName("a0030000.mipi_rx_to_video");
+	MediaEntity *unicamMipirx = unicam->getEntityByName("a0020000.mipi_rx_to_video");
 	MediaEntity *ispOutput0 = isp->getEntityByName("isp_pipe_video_dev input 0");
 	MediaEntity *ispCapture1 = isp->getEntityByName("isp_pipe_video_dev output 1");
-	//MediaEntity *ispCapture2 = isp->getEntityByName("bcm2835-isp0-capture2");
+	MediaEntity *ispCapture2 = isp->getEntityByName("isp_pipe_video_dev output 2");
 	MediaEntity *ispCapture3 = isp->getEntityByName("xil-isp-lite_stat");
 
-	if (!unicamImage || !unicamMipirx || !ispOutput0 || !ispCapture1 /*|| !ispCapture2*/ || !ispCapture3)
+	if (!unicamImage || !unicamMipirx || !ispOutput0 || !ispCapture1 || !ispCapture2 || !ispCapture3)
 		return -ENOENT;
 
 	/* Locate and open the unicam video streams. */
@@ -1262,7 +1275,7 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 	/* Tag the ISP input stream as an import stream. */
 	data->isp_[Isp::Input] = RPi::Stream("ISP Input", ispOutput0, true);
 	data->isp_[Isp::Output0] = RPi::Stream("ISP Output0", ispCapture1);
-	//data->isp_[Isp::Output1] = RPi::Stream("ISP Output1", ispCapture2);
+	data->isp_[Isp::Output1] = RPi::Stream("ISP Output1", ispCapture2);
 	data->isp_[Isp::Stats] = RPi::Stream("ISP Stats", ispCapture3);
 
 	/* Wire up all the buffer connections. */
@@ -1271,7 +1284,7 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 	data->unicam_[Unicam::Image].dev()->bufferReady.connect(data.get(), &RPiCameraData::unicamBufferDequeue);
 	data->isp_[Isp::Input].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispInputDequeue);
 	data->isp_[Isp::Output0].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
-	//data->isp_[Isp::Output1].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
+	data->isp_[Isp::Output1].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
 	data->isp_[Isp::Stats].dev()->bufferReady.connect(data.get(), &RPiCameraData::ispOutputDequeue);
 
 	data->sensor_ = std::make_unique<CameraSensor>(sensorEntity);
@@ -1412,7 +1425,7 @@ int PipelineHandlerRPi::registerCamera(MediaDevice *unicam, MediaDevice *isp, Me
 	std::set<Stream *> streams;
 	streams.insert(&data->unicam_[Unicam::Image]);
 	streams.insert(&data->isp_[Isp::Output0]);
-	//streams.insert(&data->isp_[Isp::Output1]);
+	streams.insert(&data->isp_[Isp::Output1]);
 
 	/* Create and register the camera. */
 	const std::string &id = data->sensor_->id();
@@ -2102,7 +2115,7 @@ void RPiCameraData::checkRequestCompleted()
 	 * frame.
 	 */
 	if (state_ == State::IpaComplete &&
-	    ((ispOutputCount_ == 2 && dropFrameCount_) || requestCompleted)) {
+	    ((ispOutputCount_ == 3 && dropFrameCount_) || requestCompleted)) {
 		state_ = State::Idle;
 		if (dropFrameCount_) {
 			dropFrameCount_--;

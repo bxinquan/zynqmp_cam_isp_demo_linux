@@ -1,0 +1,10 @@
+menuconfig ALLEGRO
+	tristate "Allegro video codec drivers"
+	help
+	  Enable Allegro video codec drivers
+
+if ALLEGRO
+source "drivers/staging/allegro/al5e/Kconfig"
+source "drivers/staging/allegro/al5d/Kconfig"
+source "drivers/staging/allegro/dmaproxy/Kconfig"
+endif

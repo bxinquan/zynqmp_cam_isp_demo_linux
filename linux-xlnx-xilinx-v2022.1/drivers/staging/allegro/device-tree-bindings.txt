@@ -1,0 +1,11 @@
+al5e, al5d:
+
+al,mcu_ext_mem_size: specifies the size of the external memory of the mcu. default is MCU_SUBALLOCATOR_SIZE
+
+memory-region: a phandle that points to a reserved-memory node. The driver will use the reserved memory instead of using the CMA pools to allocate its memory. It will also configure the hw ip if needed so that the ip can access the allocated memory. (See https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18841683/Linux+Reserved+Memory for more information)
+
+al,devicename: specifies the /dev/X name the created device should have. default is /dev/allegroIP for al5e and /dev/allegroDecodeIP for al5d
+
+al5r:
+
+al,devicename: specifies the /dev/X name the created device should have. default is that the /dev/X node isn't created

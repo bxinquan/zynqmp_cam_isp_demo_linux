@@ -1,0 +1,9 @@
+*.o
+*.ko
+*.symvers
+*.cmd
+*.order
+.tmp_versions/
+*.mod.c
+unittests/bin/
+tags

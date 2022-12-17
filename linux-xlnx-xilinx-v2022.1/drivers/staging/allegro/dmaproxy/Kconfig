@@ -1,0 +1,7 @@
+config DMAPROXY
+        tristate "DMA Proxy client"
+        depends on DMA_ENGINE
+        select DMA_ENGINE_RAID
+        help
+          Simple DMA proxy client. Exports APIs to perform Mem2Mem DMA transfer
+	  To compile this driver as a module, choose M here.

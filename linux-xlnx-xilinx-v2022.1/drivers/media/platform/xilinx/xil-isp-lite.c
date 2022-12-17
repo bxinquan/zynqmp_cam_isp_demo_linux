@@ -131,7 +131,9 @@
 
 #define ISP_PAD_SINK		0
 #define ISP_PAD_SOURCE		1
-#define ISP_MEDIA_PADS		2
+#define ISP_PAD_SOURCE_2	2
+//#define ISP_MEDIA_PADS		2
+#define ISP_MEDIA_PADS		3
 
 #define ISP_DRIVER_NAME		"xil-isp-lite"
 #define ISP_BUS_NAME		"platform:" ISP_DRIVER_NAME
@@ -1107,7 +1109,8 @@ static int isp_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 static int isp_start_stream(struct isp_state *isp)
 {
 	isp_write(isp, ISP_REG_INT_STATUS, 0);
-	isp_write(isp, ISP_REG_INT_MASK, ~(ISP_REG_INT_MASK_BIT_FRAME_START|ISP_REG_INT_MASK_BIT_FRAME_DONE|ISP_REG_INT_MASK_BIT_AE_DONE|ISP_REG_INT_STATUS_BIT_AWB_DONE));
+	//isp_write(isp, ISP_REG_INT_MASK, ~(ISP_REG_INT_MASK_BIT_FRAME_START|ISP_REG_INT_MASK_BIT_FRAME_DONE|ISP_REG_INT_MASK_BIT_AE_DONE|ISP_REG_INT_MASK_BIT_AWB_DONE));
+	isp_write(isp, ISP_REG_INT_MASK, ~(ISP_REG_INT_MASK_BIT_FRAME_START|ISP_REG_INT_MASK_BIT_FRAME_DONE));
 	isp_write(isp, ISP_REG_RESET, 0);
 
 	isp->frame_sequence = 0;
@@ -1145,6 +1148,8 @@ static irqreturn_t isp_irq_handler(int irq, void *data)
 	status = isp_read(isp, ISP_REG_INT_STATUS);
 	isp_write(isp, ISP_REG_INT_STATUS, 0);
 
+	//dev_info(dev, "IRQ status %08X", status);
+
 	if (status & ISP_REG_INT_STATUS_BIT_FRAME_START) {
 		//dev_info(dev, "IRQ FRAME_START");
 		isp_queue_event_frame_sync(isp, isp->frame_sequence);
@@ -1152,53 +1157,55 @@ static irqreturn_t isp_irq_handler(int irq, void *data)
 		return IRQ_HANDLED;
 	}
 
+#if 0
 	if (status & ISP_REG_INT_STATUS_BIT_AE_DONE) {
-		//dev_info(dev, "IRQ AE_DONE");
-		// static struct xil_isp_lite_stat_ae_result ae_result;
-		// u64 hist_r_cnt = 0;
-		// u64 hist_gr_cnt = 0;
-		// u64 hist_gb_cnt = 0;
-		// u64 hist_b_cnt = 0;
-		// u32 i;
-		// isp_get_stat_ae_result(isp, &ae_result);
-		// for (i = 0; i < XIL_ISP_LITE_AE_HIST_BIN_NUM; i ++) {
-		// 	hist_r_cnt += ae_result.hist_r[i];
-		// 	hist_gr_cnt += ae_result.hist_gr[i];
-		// 	hist_gb_cnt += ae_result.hist_gb[i];
-		// 	hist_b_cnt += ae_result.hist_b[i];
-		// }
-		// dev_info(dev, "IRQ AE_DONE avg-raw %llu, pix_cnt %llu, sum %llu, r_cnt %llu, gr_cnt %llu, gb_cnt %llu, b_cnt %llu",
-		// 			ae_result.sum/ae_result.pix_cnt, ae_result.pix_cnt, ae_result.sum,
-		// 			hist_r_cnt, hist_gr_cnt, hist_gb_cnt, hist_b_cnt);
+		dev_info(dev, "IRQ AE_DONE");
+		static struct xil_isp_lite_stat_ae_result ae_result;
+		u64 hist_r_cnt = 0;
+		u64 hist_gr_cnt = 0;
+		u64 hist_gb_cnt = 0;
+		u64 hist_b_cnt = 0;
+		u32 i;
+		isp_get_stat_ae_result(isp, &ae_result);
+		for (i = 0; i < XIL_ISP_LITE_AE_HIST_BIN_NUM; i ++) {
+			hist_r_cnt += ae_result.hist_r[i];
+			hist_gr_cnt += ae_result.hist_gr[i];
+			hist_gb_cnt += ae_result.hist_gb[i];
+			hist_b_cnt += ae_result.hist_b[i];
+		}
+		dev_info(dev, "IRQ AE_DONE avg-raw %llu, pix_cnt %llu, sum %llu, r_cnt %llu, gr_cnt %llu, gb_cnt %llu, b_cnt %llu",
+					ae_result.sum/ae_result.pix_cnt, ae_result.pix_cnt, ae_result.sum,
+					hist_r_cnt, hist_gr_cnt, hist_gb_cnt, hist_b_cnt);
 	}
 	if (status & ISP_REG_INT_STATUS_BIT_AWB_DONE) {
-		//dev_info(dev, "IRQ AWB_DONE");
-		// static struct xil_isp_lite_stat_awb_result awb_result;
-		// u64 hist_r_cnt = 0;
-		// u64 hist_g_cnt = 0;
-		// u64 hist_b_cnt = 0;
-		// u32 i;
-		// isp_get_stat_awb_result(isp, &awb_result);
-		// for (i = 0; i < XIL_ISP_LITE_AWB_HIST_BIN_NUM; i ++) {
-		// 	hist_r_cnt += awb_result.hist_r[i];
-		// 	hist_g_cnt += awb_result.hist_g[i];
-		// 	hist_b_cnt += awb_result.hist_b[i];
-		// }
-		// dev_info(dev, "IRQ AWB_DONE avg-rgb %llu,%llu,%llu, pix_cnt %llu, sum_r %llu, sum_g %llu, sum_b %llu, r_cnt %llu, g_cnt %llu, b_cnt %llu",
-		// 			awb_result.sum_r/awb_result.pix_cnt,
-		// 			awb_result.sum_g/awb_result.pix_cnt,
-		// 			awb_result.sum_b/awb_result.pix_cnt,
-		// 			awb_result.pix_cnt,
-		// 			awb_result.sum_r, awb_result.sum_g, awb_result.sum_b,
-		// 			hist_r_cnt, hist_g_cnt, hist_b_cnt);
+		dev_info(dev, "IRQ AWB_DONE");
+		static struct xil_isp_lite_stat_awb_result awb_result;
+		u64 hist_r_cnt = 0;
+		u64 hist_g_cnt = 0;
+		u64 hist_b_cnt = 0;
+		u32 i;
+		isp_get_stat_awb_result(isp, &awb_result);
+		for (i = 0; i < XIL_ISP_LITE_AWB_HIST_BIN_NUM; i ++) {
+			hist_r_cnt += awb_result.hist_r[i];
+			hist_g_cnt += awb_result.hist_g[i];
+			hist_b_cnt += awb_result.hist_b[i];
+		}
+		dev_info(dev, "IRQ AWB_DONE avg-rgb %llu,%llu,%llu, pix_cnt %llu, sum_r %llu, sum_g %llu, sum_b %llu, r_cnt %llu, g_cnt %llu, b_cnt %llu",
+					awb_result.sum_r/awb_result.pix_cnt,
+					awb_result.sum_g/awb_result.pix_cnt,
+					awb_result.sum_b/awb_result.pix_cnt,
+					awb_result.pix_cnt,
+					awb_result.sum_r, awb_result.sum_g, awb_result.sum_b,
+					hist_r_cnt, hist_g_cnt, hist_b_cnt);
 	}
 	if (status & ISP_REG_INT_STATUS_BIT_FRAME_DONE) {
-		//dev_info(dev, "IRQ FRAME_DONE");
+		dev_info(dev, "IRQ FRAME_DONE");
 	}
+#endif
 
 	isp->int_status |= status;
 	done_mask  = ISP_REG_INT_STATUS_BIT_FRAME_START | ISP_REG_INT_STATUS_BIT_FRAME_DONE;
-	done_mask |= ISP_REG_INT_STATUS_BIT_AE_DONE | ISP_REG_INT_STATUS_BIT_AWB_DONE;
+	//done_mask |= ISP_REG_INT_STATUS_BIT_AE_DONE | ISP_REG_INT_STATUS_BIT_AWB_DONE;
 
 	if ((isp->int_status & done_mask) == done_mask) {
 		//dev_info(dev, "Statistics done");
@@ -1456,13 +1463,21 @@ static int isp_get_hw_format(struct isp_state *isp)
 	format->height     = height;
 
 	format = &isp->pad_format[ISP_PAD_SOURCE];
-
 	*format = isp->pad_format[ISP_PAD_SINK];
 	switch (bits) {
 		case 8:   format->code = MEDIA_BUS_FMT_YUV8_1X24;  break;
 		case 10:  format->code = MEDIA_BUS_FMT_YUV10_1X30; break;
 		default:  format->code = MEDIA_BUS_FMT_YUV12_1X36; break;
 	}
+#if ISP_MEDIA_PADS > 2
+	format = &isp->pad_format[ISP_PAD_SOURCE_2];
+	*format = isp->pad_format[ISP_PAD_SINK];
+	switch (bits) {
+		case 8:   format->code = MEDIA_BUS_FMT_YUV8_1X24;  break;
+		case 10:  format->code = MEDIA_BUS_FMT_YUV10_1X30; break;
+		default:  format->code = MEDIA_BUS_FMT_YUV12_1X36; break;
+	}
+#endif
 
 	return 0;
 }
@@ -1720,6 +1735,9 @@ static int isp_probe(struct platform_device *pdev)
 	/* Initialize V4L2 subdevice and media entity */
 	isp->pads[ISP_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
 	isp->pads[ISP_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE;
+#if ISP_MEDIA_PADS > 2
+	isp->pads[ISP_PAD_SOURCE_2].flags = MEDIA_PAD_FL_SOURCE;
+#endif
 
 	/* Initialize the default format */
 	ret = isp_get_hw_format(isp);
