@@ -426,7 +426,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 	 */
 	combinedTransform_ = combined;
 
-	unsigned int rawCount = 0, outCount = 0, count = 0, maxIndex = 0;
+	unsigned int rawCount = 0, outCount = 0, count = 0;
 	std::pair<int, Size> outSize[2];
 	Size maxSize;
 	for (StreamConfiguration &cfg : config_) {
@@ -480,7 +480,6 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 			/* Record the largest resolution for fixups later. */
 			if (maxSize < cfg.size) {
 				maxSize = cfg.size;
-				maxIndex = outCount;
 			}
 			outCount++;
 		}
@@ -522,7 +521,7 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 		PixelFormat &cfgPixFmt = cfg.pixelFormat;
 		V4L2VideoDevice *dev;
 
-		if (i == maxIndex)
+		if (i == 0)
 			dev = data_->isp_[Isp::Output0].dev();
 		else
 			dev = data_->isp_[Isp::Output1].dev();
@@ -603,7 +602,10 @@ PipelineHandlerRPi::generateConfiguration(Camera *camera, const StreamRoles &rol
 			break;
 
 		case StreamRole::StillCapture:
-			fmts = data->isp_[Isp::Output0].dev()->formats();
+			if (outCount == 0)
+				fmts = data->isp_[Isp::Output0].dev()->formats();
+			else
+				fmts = data->isp_[Isp::Output1].dev()->formats();
 			pixelFormat = formats::NV12;
 			/*
 			 * Still image codecs usually expect the sYCC color space.
@@ -626,8 +628,11 @@ PipelineHandlerRPi::generateConfiguration(Camera *camera, const StreamRoles &rol
 			 * applications and enable usage of the colour denoise
 			 * algorithm.
 			 */
-			fmts = data->isp_[Isp::Output0].dev()->formats();
-			pixelFormat = formats::YUV420;
+			if (outCount == 0)
+				fmts = data->isp_[Isp::Output0].dev()->formats();
+			else
+				fmts = data->isp_[Isp::Output1].dev()->formats();
+			pixelFormat = formats::NV12;
 			/*
 			 * Choose a color space appropriate for video recording.
 			 * Rec.709 will be a good default for HD resolutions.
@@ -639,8 +644,11 @@ PipelineHandlerRPi::generateConfiguration(Camera *camera, const StreamRoles &rol
 			break;
 
 		case StreamRole::Viewfinder:
-			fmts = data->isp_[Isp::Output0].dev()->formats();
-			pixelFormat = formats::ARGB8888;
+			if (outCount == 0)
+				fmts = data->isp_[Isp::Output0].dev()->formats();
+			else
+				fmts = data->isp_[Isp::Output1].dev()->formats();
+			pixelFormat = formats::YUYV;
 			colorSpace = ColorSpace::Sycc;
 			size = { 800, 600 };
 			bufferCount = 4;
@@ -711,7 +719,6 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 
 	BayerFormat::Packing packing = BayerFormat::Packing::CSI2;
 	Size maxSize, sensorSize;
-	unsigned int maxIndex = 0;
 	bool rawStream = false;
 	unsigned int bitDepth = defaultRawBitDepth;
 
@@ -736,7 +743,6 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		} else {
 			if (cfg.size > maxSize) {
 				maxSize = config->at(i).size;
-				maxIndex = i;
 			}
 		}
 	}
@@ -807,7 +813,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		}
 
 		/* The largest resolution gets routed to the ISP Output 0 node. */
-		RPi::Stream *stream = i == maxIndex ? &data->isp_[Isp::Output0]
+		RPi::Stream *stream = i == 0 ? &data->isp_[Isp::Output0]
 						    : &data->isp_[Isp::Output1];
 
 		V4L2PixelFormat fourcc = stream->dev()->toV4L2PixelFormat(cfg.pixelFormat);
@@ -851,7 +857,7 @@ int PipelineHandlerRPi::configure(Camera *camera, CameraConfiguration *config)
 		cfg.setStream(stream);
 		stream->setExternal(true);
 
-		if (i != maxIndex)
+		if (i != 0)
 			output1Set = true;
 		else
 			output0Set = true;
