@@ -86,6 +86,11 @@ media-ctl -d /dev/media1 --set-v4l2 '"a0060000.xil_vip":1[fmt:UYVY8_1X16/1920x10
 media-ctl -d /dev/media1 --set-v4l2 '"a0070000.xil_vip":1[fmt:VYYUYY8_1X24/1920x1080 field:none]'
 gst-launch-1.0 libcamerasrc camera-name="/base/axi/i2c@a0000000/camera@36" name=camera camera.src ! video/x-raw,format=YUY2,width=1920,height=1080,framerate=30/1 ! kmssink bus-id=fd4a0000.display fullscreen-overlay=1 async=false camera.src_0 ! video/x-raw,format=NV12,width=1920,height=1080,framerate=30/1 ! omxh264enc target-bitrate=4000 ! h264parse config-interval=-1 ! mpegtsmux ! filesink location=test.mp4
 ```
+```
+media-ctl -d /dev/media1 --set-v4l2 '"a0060000.xil_vip":1[fmt:UYVY8_1X16/1024x768 field:none]'
+media-ctl -d /dev/media1 --set-v4l2 '"a0070000.xil_vip":1[fmt:VYYUYY8_1X24/1920x1080 field:none]'
+gst-launch-1.0 libcamerasrc camera-name="/base/axi/i2c@a0000000/camera@36" name=camera camera.src ! video/x-raw,format=YUY2,width=1024,height=768,framerate=30/1 ! kmssink bus-id=fd4a0000.display fullscreen-overlay=1 async=false camera.src_0 ! video/x-raw,format=NV12,width=1920,height=1080,framerate=30/1 ! omxh264enc target-bitrate=4000 ! h264parse config-interval=-1 ! mpegtsmux ! filesink location=test.mp4
+```
 
 ![image](https://github.com/bxinquan/zynqmp_cam_isp_demo_linux/blob/main/Doc/cmd.png)
 
